@@ -1,21 +1,18 @@
 //
 //  main.cpp
-//  OpenCV Test
+//  MPICH / OpenCV Test
+//  Timothy Vaccarelli, 10/26/17
 //
 //  Created by Michael Donahue on 10/25/17.
 //  Copyright © 2017 Michael Donahue. All rights reserved.
 //
 
-#include "opencv2/opencv.hpp"
+#include "mpi.h"
+#include "FrameSender.h"
+#include <cstdlib>
 #include <iostream>
 
 using namespace cv;
-
-/*Frame struct*/
-struct frame{
-    Mat frame;
-    int index;
-};
 
 //Receives a frame and displays
 void transferFrame(frame *receivedFrame){
@@ -35,34 +32,19 @@ void transferFrame(frame *receivedFrame){
     imshow("edges", edges);	//Show frame passed in
 }
 
-int main(int, char**)
+int main(int argc, char** argv)
 {
-    
-    cv::String file("test2.mp4");
-    
-    VideoCapture cap(file); // open the default camera
-    if(!cap.isOpened()){  // check if we succeeded
-        std::cout << "Failed";	//Print if we failed
-        return -1;
+    int myId, numNodes;
+    MPI_Status status;
+    MPI_Init(&argc, &argv);
+    MPI_Comm_size(MPI_COMM_WORLD, &numNodes);
+    MPI_Comm_rank(MPI_COMM_WORLD, &myId);
+    if (myId == MASTER_ID) {
+    	extractFrames(cv::String("test2.mp4"));
+    } else if (myId == PREPROCESSOR_A || myId == PREPROCESSOR_B) {
+        std::unique_ptr<frame> frameStruct = receiveFrame();
+        transferFrame(frameStruct.get());
     }
-
-    int counter = 0;	//Used as index for the frame struct
-    for(;;)
-    {
-        frame frameStruct;	//Make a new frame struct
-        Mat frameFromVideo;	
-        cap >> frameFromVideo; // get a new frame from camera
-        
-        frameStruct.frame = frameFromVideo;	//Set struct Mat object to current frame
-        frameStruct.index = counter;	//Set struct index to current count
-        counter++;			//Increment count
-        
-        transferFrame(&frameStruct);	//Send to function for processing
-        if(waitKey(30) >= 0)		//This goes here to work
-            break;
-
-    }
-    // the camera will be deinitialized automatically in VideoCapture destructor
     return 0;
 }
 
