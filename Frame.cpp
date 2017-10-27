@@ -2,7 +2,7 @@
 #include <cstdlib>
 #include "Frame.h"
 
-const static int MAX_BUFFER_LEN = 8 * 1024 * 1024;
+static const int MAX_BUFFER_LEN = 8 * 1024 * 1024;
 
 Frame::Frame(cv::Mat frame, int frameIndex) :
     cvFrame(frame),
