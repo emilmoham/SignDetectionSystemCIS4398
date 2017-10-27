@@ -86,10 +86,13 @@ void extractFrames(cv::String file) {
 
         // Store frame into our frame structure
         frameStruct.frame = frameFromVideo;
-        frameStruct.index = counter++;
+        frameStruct.index = counter;
 
         // Send to a preprocessor
         sendFrame(&frameStruct, (counter % 2 == 0) ? PREPROCESSOR_A : PREPROCESSOR_B);
+
+        // Increment counter
+        ++counter;
 
         if (waitKey(30) >= 0)
             break;
