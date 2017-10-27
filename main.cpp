@@ -8,19 +8,21 @@
 //
 
 #include "mpi.h"
-#include "FrameSender.h"
+#include "Frame.h"
+#include "NodeID.h"
+#include "Master.h"
 #include <cstdlib>
 #include <iostream>
 
 using namespace cv;
 
 //Receives a frame and displays
-void transferFrame(frame *receivedFrame){
+void transferFrame(Frame *receivedFrame){
     
     Mat edges;
     namedWindow("edges",1);
     
-    Mat localFrame = receivedFrame->frame;	//Frame passed in
+    Mat localFrame = receivedFrame->cvFrame;	//Frame passed in
     int localIndex = receivedFrame->index;	//Index passed in
     
     
@@ -41,9 +43,13 @@ int main(int argc, char** argv)
     MPI_Comm_rank(MPI_COMM_WORLD, &myId);
     if (myId == MASTER_ID) {
     	extractFrames(cv::String("test2.mp4"));
+        Master master;
+        master.setVideoFile(cv::String("test2.mp4"));
+        master.run();
     } else if (myId == PREPROCESSOR_A || myId == PREPROCESSOR_B) {
-        std::unique_ptr<frame> frameStruct = receiveFrame();
-        transferFrame(frameStruct.get());
+        Frame f;
+        f.receive(MASTER_ID);
+        transferFrame(&f);
     }
     return 0;
 }

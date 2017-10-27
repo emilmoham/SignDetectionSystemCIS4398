@@ -1,6 +1,7 @@
 #include "mpi.h"
 #include "openssl/sha.h"
-#include "FrameSender.h"
+#include "Frame.h"
+#include "NodeID.h"
 
 using namespace cv;
 
@@ -24,14 +25,14 @@ void sendFrameWithDigest(cv::String file) {
     }
 
     // Extract and send the first frame, along with its SHA256 digest
-    frame frameStruct;
-    cap >> frameStruct.frame;
+    Frame frameStruct;
+    cap >> frameStruct.cvFrame;
 
     unsigned char hash[SHA256_DIGEST_LENGTH];
-    getDigest(frameStruct.frame, &hash[0]);
+    getDigest(frameStruct.cvFrame, &hash[0]);
 
     MPI_Send(&hash, SHA256_DIGEST_LENGTH, MPI_UNSIGNED_CHAR, PREPROCESSOR_A, 0, MPI_COMM_WORLD);
-    sendFrame(&frameStruct, PREPROCESSOR_A);
+    frameStruct.send(PREPROCESSOR_A);
 }
 
 // Reads a frame structure from the master node, verifying its integrity by comparing the
