@@ -31,7 +31,7 @@ void Frame::send(int recipient)
     memcpy(&buffer[3 * sizeof(int)], cvFrame.data, numBytes);
 
     // Send frame index, followed by the frame data
-    MPI_Send(&cvFrame.index, 1, MPI_INT, recipient, 0, MPI_COMM_WORLD);
+    MPI_Send(&index, 1, MPI_INT, recipient, 0, MPI_COMM_WORLD);
     MPI_Send(&buffer, numBytes + 3 * sizeof(int), MPI_UNSIGNED_CHAR, recipient, 0, MPI_COMM_WORLD);
 }
 

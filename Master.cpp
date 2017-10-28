@@ -17,7 +17,7 @@ void Master::run()
 void Master::extractFrames()
 {
     // Open video source
-    VideoCapture cap(m_videoFile);
+    cv::VideoCapture cap(m_videoFile);
 
     // Handle errors if any
     if (!cap.isOpened())
@@ -33,11 +33,12 @@ void Master::extractFrames()
         cap >> frameStruct.cvFrame;
 
         // Assign an index to the frame
-        frameStruct.index = counter;
+        frameStruct.index = m_counter;
 
-        frameStruct.send((counter % 2 == 0) ? PREPROCESSOR_A : PREPROCESSOR_B);
+        frameStruct.send((m_counter % 2 == 0) ? PREPROCESSOR_A : PREPROCESSOR_B);
 
         // Increment counter
-        ++counter;
+        ++m_counter;
     }
 }
+

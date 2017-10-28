@@ -1,16 +1,24 @@
 PROGS=FrameSender FrameSenderTest
 
-OPENCV = `pkg-config opencv --cflags --libs`
-OPENSSL = `pkg-config libcrypto --cflags --libs`
-LIBS = $(OPENCV) $(OPENSSL)
+OPENCV_LIBS = `pkg-config opencv --libs`
+OPENSSL_LIBS = `pkg-config libcrypto --libs`
+
+OPENCV_INCLUDES = `pkg-config opencv --cflags`
+OPENSSL_INCLUDES = `pkg-config libcrypto --cflags`
+
+LIBS = $(OPENCV_LIBS) $(OPENSSL_LIBS)
+INCLUDES = $(OPENCV_INCLUDES) $(OPENSSL_INCLUDES)
 
 all:	$(PROGS)
 
-FrameSender:		FrameSender.o main.cpp
-	mpiCC -o FrameSender -O3 main.cpp FrameSender.o $(LIBS)
+FrameSender:		Frame.o Master.o main.cpp
+	mpiCC -o FrameSender -O3 main.cpp Frame.o Master.o $(INCLUDES) $(LIBS)
 
-FrameSenderTest:	FrameSender.o FrameSendTest.cpp
-	mpiCC -o FrameSenderTest -O3 FrameSender.o FrameSendTest.cpp $(LIBS)
+FrameSenderTest:	Frame.o FrameSendTest.cpp
+	mpiCC -o FrameSenderTest -O3 Frame.o FrameSendTest.cpp $(INCLUDES) $(LIBS)
 
-FrameSender.o:		FrameSender.cpp
-	mpiCC -c -O3 FrameSender.cpp $(LIBS)
+Frame.o:		Frame.cpp
+	mpiCC -c -O3 Frame.cpp $(INCLUDES)
+
+Master.o:		Master.cpp
+	mpiCC -c -O3 Master.cpp $(INCLUDES)

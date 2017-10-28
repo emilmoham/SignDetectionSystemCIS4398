@@ -43,20 +43,23 @@ void receiveAndVerifyFrame() {
     // First read the digest value
     unsigned char hashGiven[SHA256_DIGEST_LENGTH];
     MPI_Recv(&hashGiven, SHA256_DIGEST_LENGTH, MPI_UNSIGNED_CHAR, MASTER_ID, 0, MPI_COMM_WORLD, &status);
-    std::unique_ptr<frame> frameStruct = receiveFrame();
+    Frame frameStruct;
+    frameStruct.receive(MASTER_ID);
 
     // Calculate the frame's digest
     unsigned char hashCalc[SHA256_DIGEST_LENGTH];
-    getDigest(frameStruct->frame, &hashCalc[0]);
+    getDigest(frameStruct.cvFrame, &hashCalc[0]);
 
     // Compare digest values
     for (int i = 0; i < SHA256_DIGEST_LENGTH; ++i) {
         if (hashGiven[i] != hashCalc[i]) {
-	    std::cout << "Error: Digests unequal. Aborting." << std::endl;
+	    std::cout << "[Test] [Preprocessor A]: Error: Frame digests unequal" << std::endl;
+            std::cout << "[Test] [Preprocessor A]: Test Failed" << std::endl;
 	    return;
 	}
     }
-    std::cout << "Received frame, integrity of frame structure is verified." << std::endl;
+    std::cout << "[Test] [Preprocessor A]: Received frame, integrity of frame structure is verified." << std::endl;
+    std::cout << "[Test] [Preprocessor A]: Test Passed" << std::endl;
 }
 
 int main(int argc, char **argv)
@@ -67,8 +70,10 @@ int main(int argc, char **argv)
     MPI_Comm_size(MPI_COMM_WORLD, &numNodes);
     MPI_Comm_rank(MPI_COMM_WORLD, &myId);
     if (myId == MASTER_ID) {
+	std::cout  << "[Test] [Master Node]: Sending first frame of \"test2.mp4\" to preprocessor a" << std::endl;
         sendFrameWithDigest(cv::String("test2.mp4"));
-    } else {
+    } else if (myId == PREPROCESSOR_A) {
+	std::cout  << "[Test] [Preprocessor A]: Starting verification test of frame sent by master node." << std::endl;
         receiveAndVerifyFrame();
     }
     return 0;
