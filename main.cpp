@@ -16,22 +16,17 @@
 
 using namespace cv;
 
-//Receives a frame and displays
-void transferFrame(Frame *receivedFrame){
-    
-    Mat edges;
-    namedWindow("edges",1);
-    
-    Mat localFrame = receivedFrame->cvFrame;	//Frame passed in
-    int localIndex = receivedFrame->index;	//Index passed in
-    
-    
-    std::cout << localIndex;	//Output index to make sure its accurate
-    
-    cvtColor(localFrame, edges, COLOR_BGR2GRAY);
-    GaussianBlur(edges, edges, Size(7,7), 1.5, 1.5);
-    Canny(edges, edges, 0, 30, 3);
-    imshow("edges", edges);	//Show frame passed in
+// Spawns a window and displays the frame
+void transferFrame(Frame *receivedFrame)
+{
+    if (!receivedFrame) {
+        std::cout << "transferFrame(..) - Received null pointer for Frame struct. Aborting." << std::endl;
+        return;
+    }
+    // Simple display of the frame
+    namedWindow("MPI Image",1);
+    imshow("MPI Image", receivedFrame->cvFrame);
+    waitKey(0);
 }
 
 int main(int argc, char** argv)
