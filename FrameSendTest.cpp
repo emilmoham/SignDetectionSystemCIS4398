@@ -31,20 +31,21 @@ void sendFrameWithDigest(const cv::String &file) {
     unsigned char hash[SHA256_DIGEST_LENGTH];
     getDigest(frameStruct.cvFrame, &hash[0]);
 
-    MPI_Send(&hash, SHA256_DIGEST_LENGTH, MPI_UNSIGNED_CHAR, PREPROCESSOR_A, 0, MPI_COMM_WORLD);
+    MPI_Send(&hash[0], SHA256_DIGEST_LENGTH, MPI_UNSIGNED_CHAR, PREPROCESSOR_A, 0, MPI_COMM_WORLD);
+    std::cout << "Send frame digest" << std::endl;
     frameStruct.send(PREPROCESSOR_A);
 }
 
 // Reads a frame structure from the master node, verifying its integrity by comparing the
 // given digest value of the frame to the calculated value after receiving the frame data
 void receiveAndVerifyFrame() {
-    MPI_Status status;
-
     // First read the digest value
     unsigned char hashGiven[SHA256_DIGEST_LENGTH];
-    MPI_Recv(&hashGiven, SHA256_DIGEST_LENGTH, MPI_UNSIGNED_CHAR, MASTER_ID, 0, MPI_COMM_WORLD, &status);
+    MPI_Recv(&hashGiven[0], SHA256_DIGEST_LENGTH, MPI_UNSIGNED_CHAR, MASTER_ID, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+    std::cout << "Received hash value of frame" << std::endl;
     Frame frameStruct;
     frameStruct.receive(MASTER_ID);
+    std::cout << "Received frame structure" << std::endl;
 
     // Calculate the frame's digest
     unsigned char hashCalc[SHA256_DIGEST_LENGTH];
@@ -76,5 +77,6 @@ int main(int argc, char **argv)
 	std::cout  << "[Test] [Preprocessor A]: Starting verification test of frame sent by master node." << std::endl;
         receiveAndVerifyFrame();
     }
+    MPI_Finalize();
     return 0;
 }

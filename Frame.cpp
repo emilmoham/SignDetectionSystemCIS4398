@@ -47,8 +47,11 @@ void Frame::send(int recipient)
     // Send frame index, buffer length, and finally the frame data
     int bufferLen = numBytes + 3 * sizeof(int);
     MPI_Send(&index, 1, MPI_INT, recipient, 0, MPI_COMM_WORLD);
+    std::cout << "Sent index value " << index << std::endl;
     MPI_Send(&bufferLen, 1, MPI_INT, recipient, 0, MPI_COMM_WORLD);
-    MPI_Send(&buffer, numBytes + 3 * sizeof(int), MPI_UNSIGNED_CHAR, recipient, 0, MPI_COMM_WORLD);
+    std::cout << "Sent buffer length value " << bufferLen << std::endl;
+    MPI_Send(&buffer[0], numBytes + 3 * sizeof(int), MPI_UNSIGNED_CHAR, recipient, 0, MPI_COMM_WORLD);
+    std::cout << "Sent all frame data" << std::endl;
 }
 
 void Frame::receive(int sender)
@@ -57,20 +60,22 @@ void Frame::receive(int sender)
     if (m_buffer != nullptr)
         delete[] m_buffer;
     
-    MPI_Status status;
+    //MPI_Status status;
     int rows, cols, type, channels, count;
     int bufferLen = -1;
 
     // Read frame index and buffer length
-    MPI_Recv(&index, sizeof(int), MPI_INT, sender, 0, MPI_COMM_WORLD, &status);
-    MPI_Recv(&bufferLen, sizeof(int), MPI_INT, sender, 0, MPI_COMM_WORLD, &status);
+    MPI_Recv(&index, sizeof(int), MPI_INT, sender, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+    std::cout << "Received index value " << index << std::endl;
+    MPI_Recv(&bufferLen, sizeof(int), MPI_INT, sender, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+    std::cout << "Received buffer length value " << bufferLen << std::endl;
     
     // Read frame data
     if (bufferLen < 0)
         bufferLen = MAX_BUFFER_LEN;
     m_buffer = new unsigned char[bufferLen];
-    MPI_Recv(&m_buffer[0], bufferLen, MPI_UNSIGNED_CHAR, sender, 0, MPI_COMM_WORLD, &status);
-    MPI_Get_count(&status, MPI_UNSIGNED_CHAR, &count);
+    MPI_Recv(&m_buffer[0], bufferLen, MPI_UNSIGNED_CHAR, sender, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+    //MPI_Get_count(&status, MPI_UNSIGNED_CHAR, &count);
 
     // Copy metadata into rows, cols, and type integers
     memcpy((unsigned char*)&rows, &m_buffer[0], sizeof(int));
