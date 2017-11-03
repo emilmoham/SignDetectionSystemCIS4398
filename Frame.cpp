@@ -2,11 +2,11 @@
 #include <cstdlib>
 #include "Frame.h"
 
-static const int MAX_BUFFER_LEN = 8 * 1024 * 1024;
+static const int MAX_FRAME_BUFFER_LEN = 8 * 1024 * 1024;
 
 Frame::Frame() :
     cvFrame(),
-    index(),
+    index(0),
     m_buffer(nullptr)
 {
 }
@@ -26,7 +26,7 @@ Frame::~Frame()
 
 void Frame::send(int recipient)
 {
-    unsigned char buffer[MAX_BUFFER_LEN];
+    unsigned char buffer[MAX_FRAME_BUFFER_LEN];
     int rows = cvFrame.rows;
     int cols = cvFrame.cols;
     int type = cvFrame.type();
@@ -36,6 +36,7 @@ void Frame::send(int recipient)
     memcpy(&buffer[0], (unsigned char*)&rows, sizeof(int));
     memcpy(&buffer[sizeof(int)], (unsigned char*)&cols, sizeof(int));
     memcpy(&buffer[2 * sizeof(int)], (unsigned char*)&type, sizeof(int));
+    std::cout << "Copied metadata into frame sending buffer" << std::endl;
 
     int numBytes = rows * cols * channels;
     if (!cvFrame.isContinuous())
@@ -43,6 +44,7 @@ void Frame::send(int recipient)
 
     // Copy frame data into buffer
     memcpy(&buffer[3 * sizeof(int)], cvFrame.data, numBytes);
+    std::cout << "Copied cv::Mat data into frame sending buffer" << std::endl;
 
     // Send frame index, buffer length, and finally the frame data
     int bufferLen = numBytes + 3 * sizeof(int);
@@ -65,14 +67,14 @@ void Frame::receive(int sender)
     int bufferLen = -1;
 
     // Read frame index and buffer length
-    MPI_Recv(&index, sizeof(int), MPI_INT, sender, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+    MPI_Recv(&index, 1, MPI_INT, sender, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
     std::cout << "Received index value " << index << std::endl;
-    MPI_Recv(&bufferLen, sizeof(int), MPI_INT, sender, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+    MPI_Recv(&bufferLen, 1, MPI_INT, sender, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
     std::cout << "Received buffer length value " << bufferLen << std::endl;
     
     // Read frame data
     if (bufferLen < 0)
-        bufferLen = MAX_BUFFER_LEN;
+        bufferLen = MAX_FRAME_BUFFER_LEN;
     m_buffer = new unsigned char[bufferLen];
     MPI_Recv(&m_buffer[0], bufferLen, MPI_UNSIGNED_CHAR, sender, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
     //MPI_Get_count(&status, MPI_UNSIGNED_CHAR, &count);
