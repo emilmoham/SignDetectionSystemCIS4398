@@ -25,7 +25,7 @@ void transferFrame(Frame *receivedFrame)
     }
     // Simple display of the frame
     imshow("MPI Stream", receivedFrame->cvFrame);
-    waitKey(0);
+    waitKey(50);
 }
 
 int main(int argc, char** argv)
