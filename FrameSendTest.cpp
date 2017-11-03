@@ -14,7 +14,7 @@ void getDigest(const Mat &frameMat, unsigned char *output)
     SHA256_Final(output, &sha256);
 }
 
-void sendFrameWithDigest(cv::String file) {
+void sendFrameWithDigest(const cv::String &file) {
     // Open default camera
     VideoCapture cap(file);
 
@@ -71,7 +71,7 @@ int main(int argc, char **argv)
     MPI_Comm_rank(MPI_COMM_WORLD, &myId);
     if (myId == MASTER_ID) {
 	std::cout  << "[Test] [Master Node]: Sending first frame of \"test2.mp4\" to preprocessor a" << std::endl;
-        sendFrameWithDigest(cv::String("test2.mp4"));
+        sendFrameWithDigest(cv::String("./test2.mp4"));
     } else if (myId == PREPROCESSOR_A) {
 	std::cout  << "[Test] [Preprocessor A]: Starting verification test of frame sent by master node." << std::endl;
         receiveAndVerifyFrame();
