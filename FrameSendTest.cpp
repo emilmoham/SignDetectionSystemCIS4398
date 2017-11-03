@@ -28,12 +28,15 @@ void sendFrameWithDigest(const cv::String &file) {
     Frame frameStruct;
     cap >> frameStruct.cvFrame;
 
+    /*
     unsigned char hash[SHA256_DIGEST_LENGTH];
     getDigest(frameStruct.cvFrame, &hash[0]);
 
     MPI_Send(&hash[0], SHA256_DIGEST_LENGTH, MPI_UNSIGNED_CHAR, PREPROCESSOR_A, 0, MPI_COMM_WORLD);
     std::cout << "Send frame digest" << std::endl;
+    */
     frameStruct.send(PREPROCESSOR_A);
+    imwrite("image_data.jpg", frameStruct.cvFrame);
 }
 
 // Reads a frame structure from the master node, verifying its integrity by comparing the
@@ -48,6 +51,7 @@ void receiveAndVerifyFrame() {
     std::cout << "Received frame structure" << std::endl;
 
     // Calculate the frame's digest
+    /*
     unsigned char hashCalc[SHA256_DIGEST_LENGTH];
     getDigest(frameStruct.cvFrame, &hashCalc[0]);
 
@@ -61,6 +65,8 @@ void receiveAndVerifyFrame() {
     }
     std::cout << "[Test] [Preprocessor A]: Received frame, integrity of frame structure is verified." << std::endl;
     std::cout << "[Test] [Preprocessor A]: Test Passed" << std::endl;
+    */
+    imwrite("image_data.jpg", frameStruct.cvFrame);
 }
 
 int main(int argc, char **argv)
