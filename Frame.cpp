@@ -77,8 +77,8 @@ void Frame::receive(int sender)
     std::cout << "Received buffer length value " << bufferLen << std::endl;
     
     // Read frame data
-    if (bufferLen < 0)
-        bufferLen = MAX_FRAME_BUFFER_LEN;
+    //if (bufferLen < 0)
+    //    bufferLen = MAX_FRAME_BUFFER_LEN;
     m_buffer = new unsigned char[bufferLen];
     MPI_Recv(&m_buffer[0], bufferLen, MPI_UNSIGNED_CHAR, sender, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
     //MPI_Get_count(&status, MPI_UNSIGNED_CHAR, &count);
