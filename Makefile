@@ -12,13 +12,13 @@ INCLUDES = $(OPENCV_INCLUDES) $(OPENSSL_INCLUDES)
 all:	$(PROGS)
 
 FrameSender:		Frame.o Master.o main.cpp
-	mpiCC -o FrameSender -O3 main.cpp Frame.o Master.o $(INCLUDES) $(LIBS)
+	mpiCC -g -o FrameSender -O3 main.cpp Frame.o Master.o $(INCLUDES) $(LIBS)
 
 FrameSenderTest:	Frame.o FrameSendTest.cpp
-	mpiCC -o FrameSenderTest -O3 Frame.o FrameSendTest.cpp $(INCLUDES) $(LIBS)
+	mpiCC -g -o FrameSenderTest -O3 Frame.o FrameSendTest.cpp $(INCLUDES) $(LIBS)
 
 Frame.o:		Frame.cpp
-	mpiCC -c -O3 Frame.cpp $(INCLUDES)
+	mpiCC -g -c -O3 Frame.cpp $(INCLUDES)
 
 Master.o:		Master.cpp
-	mpiCC -c -O3 Master.cpp $(INCLUDES)
+	mpiCC -g -c -O3 Master.cpp $(INCLUDES)

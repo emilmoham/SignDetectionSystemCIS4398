@@ -26,16 +26,20 @@ Frame::~Frame()
 
 void Frame::send(int recipient)
 {
-    unsigned char buffer[MAX_FRAME_BUFFER_LEN];
+    //unsigned char buffer[MAX_FRAME_BUFFER_LEN];
+    if (m_buffer != nullptr)
+	    delete[] m_buffer;
+    m_buffer = new unsigned char[MAX_FRAME_BUFFER_LEN];
+    std::cout << "Frame::send - allocated memory for buffer" << std::endl;
     int rows = cvFrame.rows;
     int cols = cvFrame.cols;
     int type = cvFrame.type();
     int channels = cvFrame.channels();
 
     // Copy frame metadata into buffer
-    memcpy(&buffer[0], (unsigned char*)&rows, sizeof(int));
-    memcpy(&buffer[sizeof(int)], (unsigned char*)&cols, sizeof(int));
-    memcpy(&buffer[2 * sizeof(int)], (unsigned char*)&type, sizeof(int));
+    memcpy(&m_buffer[0], (unsigned char*)&rows, sizeof(int));
+    memcpy(&m_buffer[sizeof(int)], (unsigned char*)&cols, sizeof(int));
+    memcpy(&m_buffer[2 * sizeof(int)], (unsigned char*)&type, sizeof(int));
     std::cout << "Copied metadata into frame sending buffer" << std::endl;
 
     int numBytes = rows * cols * channels;
@@ -43,7 +47,7 @@ void Frame::send(int recipient)
         cvFrame = cvFrame.clone();
 
     // Copy frame data into buffer
-    memcpy(&buffer[3 * sizeof(int)], cvFrame.data, numBytes);
+    memcpy(&m_buffer[3 * sizeof(int)], cvFrame.data, numBytes);
     std::cout << "Copied cv::Mat data into frame sending buffer" << std::endl;
 
     // Send frame index, buffer length, and finally the frame data
@@ -52,7 +56,7 @@ void Frame::send(int recipient)
     std::cout << "Sent index value " << index << std::endl;
     MPI_Send(&bufferLen, 1, MPI_INT, recipient, 0, MPI_COMM_WORLD);
     std::cout << "Sent buffer length value " << bufferLen << std::endl;
-    MPI_Send(&buffer[0], numBytes + 3 * sizeof(int), MPI_UNSIGNED_CHAR, recipient, 0, MPI_COMM_WORLD);
+    MPI_Send(&m_buffer[0], numBytes + 3 * sizeof(int), MPI_UNSIGNED_CHAR, recipient, 0, MPI_COMM_WORLD);
     std::cout << "Sent all frame data" << std::endl;
 }
 
