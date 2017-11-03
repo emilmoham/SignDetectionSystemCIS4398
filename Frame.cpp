@@ -7,14 +7,16 @@ static const int MAX_FRAME_BUFFER_LEN = 8 * 1024 * 1024;
 Frame::Frame() :
     cvFrame(),
     index(0),
-    m_buffer(nullptr)
+    m_buffer(nullptr),
+    m_bufferLen(0)
 {
 }
 
 Frame::Frame(cv::Mat frame, int frameIndex) :
     cvFrame(frame),
     index(frameIndex),
-    m_buffer(nullptr)
+    m_buffer(nullptr),
+    m_bufferLen(0)
 {
 }
 
@@ -27,9 +29,8 @@ Frame::~Frame()
 void Frame::send(int recipient)
 {
     //unsigned char buffer[MAX_FRAME_BUFFER_LEN];
-    if (m_buffer != nullptr)
-	    delete[] m_buffer;
-    m_buffer = new unsigned char[MAX_FRAME_BUFFER_LEN];
+    if (m_buffer == nullptr)
+        m_buffer = new unsigned char[MAX_FRAME_BUFFER_LEN];
     std::cout << "Frame::send - allocated memory for buffer" << std::endl;
     int rows = cvFrame.rows;
     int cols = cvFrame.cols;
@@ -62,9 +63,6 @@ void Frame::send(int recipient)
 
 void Frame::receive(int sender)
 {
-    // Check if m_buffer was used before calling receive, and if so, delete it
-    if (m_buffer != nullptr)
-        delete[] m_buffer;
     
     //MPI_Status status;
     int rows, cols, type, channels, count;
@@ -79,7 +77,16 @@ void Frame::receive(int sender)
     // Read frame data
     //if (bufferLen < 0)
     //    bufferLen = MAX_FRAME_BUFFER_LEN;
-    m_buffer = new unsigned char[bufferLen];
+
+    // Check if m_buffer was used before calling receive, and if so, delete it
+    //if (m_buffer != nullptr)
+    //    delete[] m_buffer;
+    if (bufferLen > m_bufferLen)
+    {
+        delete[] m_buffer;
+        m_buffer = new unsigned char[bufferLen];
+        m_bufferLen = bufferLen;
+    }
     MPI_Recv(&m_buffer[0], bufferLen, MPI_UNSIGNED_CHAR, sender, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
     //MPI_Get_count(&status, MPI_UNSIGNED_CHAR, &count);
 

@@ -36,6 +36,9 @@ private:
     /// Buffer for raw frame data - when passing frame through MPI and converted into a cv::Mat,
     /// the Mat object points to the buffer and it is up to the Frame object to deallocate the buffer
     unsigned char *m_buffer;
+
+    /// Stores the size of the buffer
+    size_t m_bufferLen;
 };
 
 #endif //__FRAME_H_
