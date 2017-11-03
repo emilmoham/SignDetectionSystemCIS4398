@@ -24,8 +24,7 @@ void transferFrame(Frame *receivedFrame)
         return;
     }
     // Simple display of the frame
-    namedWindow("MPI Image",1);
-    imshow("MPI Image", receivedFrame->cvFrame);
+    imshow("MPI Stream", receivedFrame->cvFrame);
     waitKey(0);
 }
 
@@ -42,8 +41,12 @@ int main(int argc, char** argv)
         master.run();
     } else if (myId == PREPROCESSOR_A || myId == PREPROCESSOR_B) {
         Frame f;
-        f.receive(MASTER_ID);
-        transferFrame(&f);
+        namedWindow("MPI Stream",1);
+	for (;;)
+	{
+            f.receive(MASTER_ID);
+            transferFrame(&f);
+	}
     }
     return 0;
 }

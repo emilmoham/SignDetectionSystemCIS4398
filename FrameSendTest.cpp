@@ -24,6 +24,8 @@ void sendFrameWithDigest(const cv::String &file) {
         return;
     }
 
+    cap.set(1, 150);
+
     // Extract and send the first frame, along with its SHA256 digest
     Frame frameStruct;
     cap >> frameStruct.cvFrame;
@@ -43,9 +45,9 @@ void sendFrameWithDigest(const cv::String &file) {
 // given digest value of the frame to the calculated value after receiving the frame data
 void receiveAndVerifyFrame() {
     // First read the digest value
-    unsigned char hashGiven[SHA256_DIGEST_LENGTH];
-    MPI_Recv(&hashGiven[0], SHA256_DIGEST_LENGTH, MPI_UNSIGNED_CHAR, MASTER_ID, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-    std::cout << "Received hash value of frame" << std::endl;
+    //unsigned char hashGiven[SHA256_DIGEST_LENGTH];
+    //MPI_Recv(&hashGiven[0], SHA256_DIGEST_LENGTH, MPI_UNSIGNED_CHAR, MASTER_ID, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+    //std::cout << "Received hash value of frame" << std::endl;
     Frame frameStruct;
     frameStruct.receive(MASTER_ID);
     std::cout << "Received frame structure" << std::endl;
