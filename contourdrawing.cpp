@@ -25,7 +25,7 @@ int main( int argc, char** argv )
     vector<vector<Point> > contours;
     vector<Vec4i> hierarchy;
     
-    image = imread("all.jpg", CV_LOAD_IMAGE_COLOR);   // Read the file
+    image = imread("road-signs.jpg", CV_LOAD_IMAGE_COLOR);   // Read the file
     
     if(! image.data )                              // Check for invalid input
     {
