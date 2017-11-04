@@ -6,7 +6,7 @@
 
 #IncludeRegexTransform: 
 
-/home/ben/SignDetectionSystemCIS4398/main.cpp
+/home/ben/SignDetectionSystemCIS4398/cpp/main.cpp
 opencv2/highgui/highgui.hpp
 -
 opencv2/imgproc/imgproc.hpp
@@ -16,7 +16,7 @@ cmath
 iostream
 -
 opencv2/opencv.hpp
-/home/ben/SignDetectionSystemCIS4398/opencv2/opencv.hpp
+/home/ben/SignDetectionSystemCIS4398/cpp/opencv2/opencv.hpp
 opencv2/core/core.hpp
 -
 

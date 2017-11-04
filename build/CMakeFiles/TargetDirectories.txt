@@ -1,4 +1,0 @@
-/home/ben/SignDetectionSystemCIS4398/build/CMakeFiles/rebuild_cache.dir
-/home/ben/SignDetectionSystemCIS4398/build/CMakeFiles/edit_cache.dir
-/home/ben/SignDetectionSystemCIS4398/build/CMakeFiles/main.dir
-/home/ben/SignDetectionSystemCIS4398/build/CMakeFiles/contourdrawing.dir
