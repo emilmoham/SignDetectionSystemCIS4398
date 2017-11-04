@@ -42,28 +42,31 @@ void setLabel(cv::Mat& im, const std::string label, std::vector<cv::Point>& cont
     cv::Point pt(r.x + ((r.width - text.width) / 2), r.y + ((r.height + text.height) / 2));
     cv::rectangle(im, pt + cv::Point(0, baseline), pt + cv::Point(text.width, -text.height), CV_RGB(255,255,255), CV_FILLED);
     cv::putText(im, label, pt, fontface, scale, CV_RGB(0,0,0), thickness, 8);
-    
 }
 
 int main()
 {
     
-    VideoCapture cap(0);
-    if(!cap.isOpened()){  // check if we succeeded
-        std::cout << "Failed";	//Print if we failed
+  //VideoCapture cap(0);
+  //if(!cap.isOpened()){  // check if we succeeded
+  //  std::cout << "Failed" << endl;	//Print if we failed
+  //    return -1;
+  //}
+    
+    cv::Mat src = cv::imread("road-signs.jpg", CV_LOAD_IMAGE_COLOR);
+    //cv::Mat src = cv::imread("all.jpg");
+    if(!src.data )                              // Check for invalid input
+    {
+        cout <<  "Could not open or find the image" << std::endl ;
         return -1;
     }
-    
-    //cv::Mat src = cv::imread("differentshapes.png");
-    //cv::Mat src = cv::imread("all.jpg");
-    //if (src.empty())
-    //    return -1;
     
     for(;;){
     
         // Convert to grayscale
         Mat frameFromVideo;
-        cap >> frameFromVideo; // get a new frame from camera
+        //cap >> frameFromVideo; // get a new frame from camera
+	frameFromVideo = src;
         cv::Mat gray;
         cv::cvtColor(frameFromVideo, gray, CV_BGR2GRAY);
         
@@ -131,6 +134,16 @@ int main()
                     setLabel(dst, "CIR", contours[i]);
             }
         }
+
+
+	// drawing contours
+	for( int i = 0; i< contours.size(); i++ )
+	{
+	  Scalar color = Scalar( 255, 255, 0 );
+	  //approxPolyDP(Mat(contours[i]), contours[i], 3, true);
+	  drawContours( dst, contours, i, color, 2);
+	}
+	
         cv::imshow("src", frameFromVideo);
         cv::imshow("dst", dst);
         
