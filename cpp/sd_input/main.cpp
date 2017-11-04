@@ -1,7 +1,7 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include <iostream>
-#include "FrameDemo.h"
+#include "headers/FrameDemo.h"
 #include <string>
 
 using namespace cv;
