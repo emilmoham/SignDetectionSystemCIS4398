@@ -6,9 +6,10 @@
 
 struct Frame{
     int index;
-    //cv::Mat image
+    cv::Mat mat
 
-    Frame(int i) : index(i){}
+    //Constructor
+    Frame(int i, cv::Mat cvmat) : index(i), mat(cvmat){}
 
     //Public Functions
     void print(){
@@ -17,18 +18,22 @@ struct Frame{
 };
 
 struct Region{
-    //Rectangle Definition Members
-    int x, y, w, h;
+    vector<Point> contour;
+    int shape;
+    int color;
 
     //Constructor
-    Region(int x, int y, int w, int h): x(x), y(y), w(w), h(h){}
+    Region(vector<Point> contour): contour(contour){}
 
     //Public Functions
     void print(){
-        printf("x = %d\n", x);
-        printf("y = %d\n", y);
-        printf("w = %d\n", w);
-        printf("h = %d\n", h);
+	if(contour != NULL){
+	    printf("has contour. shape=%d, color=%d\n", shape, color);
+	}
+    }
+
+    int getBoundingBox(){
+        
     }
 };
 
