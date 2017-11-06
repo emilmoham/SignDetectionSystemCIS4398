@@ -53,8 +53,8 @@ int sd_getShape(std::vector<cv::Point> approx, std::vector<cv::Point> contour){
             else
             {
                 // Detect and label circles
-                double area = cv::contourArea(contours[i]);
-                cv::Rect r = cv::boundingRect(contours[i]);
+                double area = cv::contourArea(contour);
+                cv::Rect r = cv::boundingRect(contour);
                 int radius = r.width / 2;
                 
                 if (std::abs(1 - ((double)r.width / r.height)) <= 0.2 &&

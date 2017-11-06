@@ -11,27 +11,25 @@ using namespace cv;
 using namespace std;
 
 void sd_drawContours(cv::Mat& im, vector<vector<Point> > contours){
-    // Draw contours
+  Scalar color = Scalar( 128, 255, 0 );
     for( int i = 0; i< contours.size(); i++ ) {
-        Scalar color = Scalar( 0, 0, 255 );
-        //approxPolyDP(Mat(contours[i]), contours[i], 3, true);
-        drawContours( im, contours, i, color, 2, 8, hierarchy, 0, Point() );
+        drawContours( im, contours, i, color, 2 );
     }
 }
 
-void sd_labelShape(vc::Mat& im, int shape, std::vector<cv::Point>& contour){
+void sd_labelShape(cv::Mat& im, int shape, std::vector<cv::Point>& contour){
             switch(shape){
-	    case 10: sd_setLabel(dst, "CIR", contours[i]);
+	    case 10: sd_setLabel(im, "CIR", contour);
 	      break;
-	    case 30: sd_setLabel(dst, "TRI", contours[i]);
+	    case 30: sd_setLabel(im, "TRI", contour);
 	      break;
-	    case 40: sd_setLabel(dst, "RECT", contours[i]);
+	    case 40: sd_setLabel(im, "RECT", contour);
 	      break;
-	    case 50: sd_setLabel(dst, "PENTA", contours[i]);
+	    case 50: sd_setLabel(im, "PENTA", contour);
 	      break;
-	    case 60: sd_setLabel(dst, "HEXA", contours[i]);
+	    case 60: sd_setLabel(im, "HEXA", contour);
 	      break;
-	    case 80: sd_setLabel(dst, "OCTO", contours[i]);
+	    case 80: sd_setLabel(im, "OCTO", contour);
 	      break;
 	    }
 }

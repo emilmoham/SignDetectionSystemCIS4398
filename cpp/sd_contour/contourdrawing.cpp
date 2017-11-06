@@ -6,13 +6,9 @@
 //  Copyright © 2017 Michael Donahue. All rights reserved.
 //
 
-#include <opencv2/core/core.hpp>
-#include <opencv2/highgui/highgui.hpp>
-#include <iostream>
-#include "opencv2/opencv.hpp"
-#include <opencv2/imgproc/imgproc.hpp>
-
+#include "../headers/OpenCVHeaders.h"
 #include "Contour.h"
+#include "../sd_render/Render.h"
 
 using namespace cv;
 using namespace std;
