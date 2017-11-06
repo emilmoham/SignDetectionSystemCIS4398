@@ -37,6 +37,7 @@ int main(int argc, char** argv)
     MPI_Comm_rank(MPI_COMM_WORLD, &myId);
     if (myId == MASTER_ID) {
         Master master;
+        master.setInputType(InputType::File);
         master.setVideoFile(cv::String("test2.mp4"));
         master.run();
     } else if (myId == PREPROCESSOR_A || myId == PREPROCESSOR_B) {
