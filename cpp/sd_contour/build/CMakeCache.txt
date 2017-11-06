@@ -169,6 +169,12 @@ CMAKE_VERBOSE_MAKEFILE:BOOL=FALSE
 OpenCV_DIR:PATH=/usr/local/share/OpenCV
 
 //Value Computed by CMake
+contourdrawing_BINARY_DIR:STATIC=/home/ben/SignDetectionSystemCIS4398/cpp/sd_contour/build
+
+//Value Computed by CMake
+contourdrawing_SOURCE_DIR:STATIC=/home/ben/SignDetectionSystemCIS4398/cpp/sd_contour
+
+//Value Computed by CMake
 main_BINARY_DIR:STATIC=/home/ben/SignDetectionSystemCIS4398/cpp/sd_contour/build
 
 //Value Computed by CMake

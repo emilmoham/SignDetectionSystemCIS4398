@@ -123,6 +123,19 @@ main/fast:
 	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/build
 .PHONY : main/fast
 
+#=============================================================================
+# Target rules for targets named contourdrawing
+
+# Build rule for target.
+contourdrawing: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 contourdrawing
+.PHONY : contourdrawing
+
+# fast build rule for target.
+contourdrawing/fast:
+	$(MAKE) -f CMakeFiles/contourdrawing.dir/build.make CMakeFiles/contourdrawing.dir/build
+.PHONY : contourdrawing/fast
+
 contour.o: contour.cpp.o
 
 .PHONY : contour.o
@@ -149,6 +162,33 @@ contour.s: contour.cpp.s
 contour.cpp.s:
 	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/contour.cpp.s
 .PHONY : contour.cpp.s
+
+contourdrawing.o: contourdrawing.cpp.o
+
+.PHONY : contourdrawing.o
+
+# target to build an object file
+contourdrawing.cpp.o:
+	$(MAKE) -f CMakeFiles/contourdrawing.dir/build.make CMakeFiles/contourdrawing.dir/contourdrawing.cpp.o
+.PHONY : contourdrawing.cpp.o
+
+contourdrawing.i: contourdrawing.cpp.i
+
+.PHONY : contourdrawing.i
+
+# target to preprocess a source file
+contourdrawing.cpp.i:
+	$(MAKE) -f CMakeFiles/contourdrawing.dir/build.make CMakeFiles/contourdrawing.dir/contourdrawing.cpp.i
+.PHONY : contourdrawing.cpp.i
+
+contourdrawing.s: contourdrawing.cpp.s
+
+.PHONY : contourdrawing.s
+
+# target to generate assembly for a file
+contourdrawing.cpp.s:
+	$(MAKE) -f CMakeFiles/contourdrawing.dir/build.make CMakeFiles/contourdrawing.dir/contourdrawing.cpp.s
+.PHONY : contourdrawing.cpp.s
 
 home/ben/SignDetectionSystemCIS4398/cpp/sd_render/render.o: home/ben/SignDetectionSystemCIS4398/cpp/sd_render/render.cpp.o
 
@@ -240,9 +280,13 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... edit_cache"
 	@echo "... main"
+	@echo "... contourdrawing"
 	@echo "... contour.o"
 	@echo "... contour.i"
 	@echo "... contour.s"
+	@echo "... contourdrawing.o"
+	@echo "... contourdrawing.i"
+	@echo "... contourdrawing.s"
 	@echo "... home/ben/SignDetectionSystemCIS4398/cpp/sd_render/render.o"
 	@echo "... home/ben/SignDetectionSystemCIS4398/cpp/sd_render/render.i"
 	@echo "... home/ben/SignDetectionSystemCIS4398/cpp/sd_render/render.s"
