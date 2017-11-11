@@ -15,8 +15,8 @@
 class Region : public Passable
 {
 public:
-    /// Vector of points making up the contour. Point structure contains fields for x and y coordinates
-    std::vector<cv::Point> cvContour;
+    /// Vector of contours. Point structure within contour only contains fields for x and y coordinates
+    std::vector< std::vector<cv::Point> > cvContours;
 
     /// Type of shape 
     Shape shapeType;
