@@ -7,7 +7,7 @@ include_directories(${OpenCV_INCLUDE_DIRS})
 set(CURRENT_COMPILER "STD")
 
 macro(use_std_compiler)
-  if (${CURRENT_COMPILER) STREQUAL "MPI")
+  if (${CURRENT_COMPILER} STREQUAL "MPI")
     # Change compiler
     set(CMAKE_C_COMPILER "gcc")
     set(CMAKE_CXX_COMPILER "g++")
@@ -16,7 +16,7 @@ macro(use_std_compiler)
 endmacro()
 
 macro(use_mpi_compiler)
-  if (${CURRENT_COMPILER) STREQUAL "STD")
+  if (${CURRENT_COMPILER} STREQUAL "STD")
     # Change compiler
     set(CMAKE_C_COMPILER "mpicc")
     set(CMAKE_CXX_COMPILER "mpiCC")
