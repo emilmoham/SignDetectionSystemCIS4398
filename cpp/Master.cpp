@@ -51,7 +51,7 @@ void Master::extractFrames()
         frameStruct.index = m_counter;
 
         //frameStruct.send((m_counter % 2 == 0) ? PREPROCESSOR_A : PREPROCESSOR_B);
-	frameStruct.send(PREPROCESSOR_A);
+        frameStruct.send(PREPROCESSOR_A);
 
         // Increment counter
         ++m_counter;

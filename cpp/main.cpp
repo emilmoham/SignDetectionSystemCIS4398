@@ -43,11 +43,11 @@ int main(int argc, char** argv)
     } else if (myId == PREPROCESSOR_A || myId == PREPROCESSOR_B) {
         Frame f;
         namedWindow("MPI Stream",1);
-	for (;;)
-	{
+	    for (;;)
+	    {
             f.receive(MASTER_ID);
             transferFrame(&f);
-	}
+	    }
     }
     return 0;
 }
