@@ -32,7 +32,17 @@ int main(int argc, char** argv)
 {
     int myId, numNodes;
     MPI_Status status;
-    MPI_Init(&argc, &argv);
+    //MPI_Init(&argc, &argv);
+    int threadSupport;
+    int errCode = MPI_Init_thread(&argc, &argv, MPI_THREAD_MULTIPLE, &threadSupport);
+    if (errCode == MPI_ERR_OTHER) {
+        std::cout << "Error initializing MPI in multi-threaded mode." << std::endl;
+        return 0;
+    }
+    if (threadSupport != MPI_THREAD_MULTIPLE) {
+        std::cout << "Warning: MPICH cannot provide MPI_THREAD_MULTIPLE support." << std::endl;
+    }
+
     MPI_Comm_size(MPI_COMM_WORLD, &numNodes);
     MPI_Comm_rank(MPI_COMM_WORLD, &myId);
     if (myId == MASTER_ID) {
@@ -49,6 +59,7 @@ int main(int argc, char** argv)
             transferFrame(&f);
 	    }
     }
+    MPI_Finalize();
     return 0;
 }
 

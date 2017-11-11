@@ -3,6 +3,8 @@
 
 #include "opencv2/opencv.hpp"
 #include "Node.h"
+#include "SafeQueue.h"
+#include <thread>
 
 /// Types of input from which the master node can extract data
 enum class InputType
@@ -34,6 +36,12 @@ private:
     /// Extracts frames from the video source, sending them to the preprocessors
     void extractFrames();
 
+    /// Waits for slave nodes to send processed frame results back to the master node
+    void getFrameResults();
+
+    /// Starts a listener in a separate thread to retrieve processed frame information
+    std::thread startListener();
+
 private:
     /// Input type
     InputType m_inputType;
@@ -43,6 +51,9 @@ private:
 
     /// Frame counter
     int m_counter;
+
+    /// Queue of frames that have been sent out to a slave node, that the master is waiting on for a frame result
+    SafeQueue<int> m_waitQueue;
 };
 
 #endif //__MASTER_H_

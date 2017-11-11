@@ -41,6 +41,8 @@ void Master::extractFrames()
         return;
     }
 
+    std::thread listenThread = startListener();
+
     Frame frameStruct;
     for (;;)
     {
@@ -53,8 +55,46 @@ void Master::extractFrames()
         //frameStruct.send((m_counter % 2 == 0) ? PREPROCESSOR_A : PREPROCESSOR_B);
         frameStruct.send(PREPROCESSOR_A);
 
-        // Increment counter
-        ++m_counter;
+        // Add frame's index to the waiting queue, and increment counter
+        m_waitQueue.enqueue(m_counter++);
     }
+
+    listenThread.join();
+}
+
+void Master::getFrameResults()
+{
+    //TODO: infinite loop retrieving FrameResults, finding corresponding frames in 
+    //      waiting buffer by index, removing them from buffer and appending result in output buffer
+
+    // Commented out as FrameResult is not implemented
+    /*
+        FrameResult f1, f2;
+        while (true)
+        {
+            f1.receive(ANALYZER_A);
+            f2.receive(ANALYZER_B);
+
+            m_waitQueue.erase(f1.index);
+            m_waitQueue.erase(f2.index);
+
+            if (f1.index < f2.index)
+            {
+                m_outputQueue.enqueue(f1);
+                m_outputQueue.enqueue(f2);
+            }
+            else
+            {
+                m_outputQueue.enqueue(f2);
+                m_outputQueue.enqueue(f1);
+            }
+        }
+
+    */
+}
+
+std::thread Master::startListener()
+{
+    return std::thread([=] { getFrameResults(); });
 }
 
