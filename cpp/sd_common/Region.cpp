@@ -1,5 +1,6 @@
 #include "Region.h"
 #include <utility>
+#include <mpi.h>
 
 void Region::send(int recipient)
 {
