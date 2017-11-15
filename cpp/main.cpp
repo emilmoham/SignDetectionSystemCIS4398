@@ -11,16 +11,19 @@
 #include "Frame.h"
 #include "NodeID.h"
 #include "Master.h"
+#include "LogHelper.h"
 #include <cstdlib>
 #include <iostream>
 
 using namespace cv;
 
+LogHelper sLog;
+
 // Spawns a window and displays the frame
 void transferFrame(Frame *receivedFrame)
 {
     if (!receivedFrame) {
-        std::cout << "transferFrame(..) - Received null pointer for Frame struct. Aborting." << std::endl;
+        LOG_ERROR("sd_renderer", "transferFrame(..) - Received null pointer for frame structure. Aborting");
         return;
     }
     // Simple display of the frame
@@ -35,6 +38,9 @@ int main(int argc, char** argv)
     MPI_Init(&argc, &argv);
     MPI_Comm_size(MPI_COMM_WORLD, &numNodes);
     MPI_Comm_rank(MPI_COMM_WORLD, &myId);
+
+    sLog.setLogDir("./");
+
     if (myId == MASTER_ID) {
         Master master;
         master.setInputType(InputType::File);

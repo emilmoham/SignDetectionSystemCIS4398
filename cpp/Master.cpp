@@ -1,7 +1,7 @@
 #include "Master.h"
 #include "NodeID.h"
 #include "Frame.h"
-#include <iostream>
+#include "LogHelper.h"
 
 void Master::setInputType(InputType type)
 {
@@ -37,7 +37,7 @@ void Master::extractFrames()
     // Handle errors if any
     if (!ok)
     {
-        std::cout << "[Master Node]: Fatal error - could not open video input" << std::endl;
+        LOG_ERROR("sd_node.Master" "Could not open video input");
         return;
     }
 
