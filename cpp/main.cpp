@@ -12,8 +12,10 @@
 #include "NodeID.h"
 #include "Master.h"
 #include "LogHelper.h"
+#include "SysInfo.h"
 #include <cstdlib>
 #include <iostream>
+#include <thread>
 
 using namespace cv;
 
@@ -40,6 +42,10 @@ int main(int argc, char** argv)
     MPI_Comm_rank(MPI_COMM_WORLD, &myId);
 
     sLog.setLogDir("./");
+    
+    // Initialize info / debugging class and run in separate thread before main node objects are initialized
+    SysInfo info(myId);
+    std::thread t1(&SysInfo::run, &info);
 
     if (myId == MASTER_ID) {
         Master master;
@@ -55,6 +61,9 @@ int main(int argc, char** argv)
             transferFrame(&f);
 	    }
     }
+
+    t1.join();
+    MPI_Finalize();
     return 0;
 }
 
