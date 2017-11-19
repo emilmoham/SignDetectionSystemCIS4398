@@ -47,7 +47,7 @@ void SysInfo::printCPUStats()
     }
 }
 
-std::string SysInfo::exec(char *cmd)
+std::string SysInfo::exec(const char *cmd)
 {
     std::array<char, 128> buffer;
     std::string result;

@@ -4,6 +4,9 @@ find_package(OpenCV REQUIRED)
 find_package(MPI REQUIRED)
 include_directories(${OpenCV_INCLUDE_DIRS})
 
+set(THREADS_PREFER_PTHREAD_FLAG ON)
+find_package(Threads REQUIRED)
+
 set(CURRENT_COMPILER "STD")
 
 macro(use_std_compiler)

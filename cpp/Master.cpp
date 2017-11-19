@@ -37,7 +37,7 @@ void Master::extractFrames()
     // Handle errors if any
     if (!ok)
     {
-        LOG_ERROR("sd_node.Master" "Could not open video input");
+        LOG_ERROR("sd_node.Master", "Could not open video input");
         return;
     }
 

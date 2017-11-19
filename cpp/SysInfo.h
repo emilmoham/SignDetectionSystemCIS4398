@@ -17,11 +17,11 @@ private:
     void printCPUStats();
 
     /// Executes the given command, returning its output in string format
-    std::string exec(const char* cmd)                                                                                                                                                             
+    std::string exec(const char* cmd); 
 private:
     /// Node identifier
     int m_nodeId;
-}
+};
 
 #endif //__SYS_INFO_H_
 
