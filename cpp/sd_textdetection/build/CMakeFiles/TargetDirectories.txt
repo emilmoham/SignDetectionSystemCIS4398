@@ -1,0 +1,3 @@
+/home/ben/SignDetectionSystemCIS4398/cpp/sd_textdetection/build/CMakeFiles/edit_cache.dir
+/home/ben/SignDetectionSystemCIS4398/cpp/sd_textdetection/build/CMakeFiles/rebuild_cache.dir
+/home/ben/SignDetectionSystemCIS4398/cpp/sd_textdetection/build/CMakeFiles/textsample.dir
