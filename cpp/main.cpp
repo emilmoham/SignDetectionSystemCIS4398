@@ -9,6 +9,7 @@
 
 #include "mpi.h"
 #include "Frame.h"
+#include "FrameResult.h"
 #include "NodeID.h"
 #include "Master.h"
 #include "LogHelper.h"
@@ -47,6 +48,7 @@ int main(int argc, char** argv)
         master.setVideoFile(cv::String("test2.mp4"));
         master.run();
     } else if (myId == PREPROCESSOR_A || myId == PREPROCESSOR_B) {
+      // TODO Preprocessor impl
         Frame f;
         namedWindow("MPI Stream",1);
 	    for (;;)
@@ -54,6 +56,10 @@ int main(int argc, char** argv)
             f.receive(MASTER_ID);
             transferFrame(&f);
 	    }
+    } else if (myId == RENDERER_ID) {
+      Renderer rend;
+      rend.setOutputMode(OutputMode::Debug);
+      rend.run();
     }
     return 0;
 }

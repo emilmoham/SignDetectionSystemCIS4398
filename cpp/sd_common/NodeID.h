@@ -8,7 +8,8 @@ enum NodeID
     PREPROCESSOR_A  = 1,
     PREPROCESSOR_B  = 2,
     ANALYZER_A      = 3,
-    ANALYZER_B      = 4
+    ANALYZER_B      = 4,
+    RENDERER_ID     = 5
 };
 
 #endif //__NODE_ID_H_
