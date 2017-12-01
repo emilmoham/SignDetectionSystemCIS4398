@@ -43,13 +43,13 @@ void Master::extractFrames()
     }
 
     // Determine FPS of video source
-    int fps = (int) cap.get(CV_CAP_PROP_FPS);
-    int delay = 1000 / fps;
+    //int fps = (int) cap.get(CV_CAP_PROP_FPS);
+    //int delay = 1000 / fps;
 
     // Send delay information to rendering node
     // TODO: only send delay info to the rendering node. need to pick a specific node or broadcast to all nodes
-    MPI_Send(&delay, 1, MPI_INT, PREPROCESSOR_A, 0, MPI_COMM_WORLD);
-    LOG_DEBUG("sd_node.Master", "Sent suggested delay between frames of ", delay, " to node ", PREPROCESSOR_A);
+    //MPI_Send(&delay, 1, MPI_INT, PREPROCESSOR_A, 0, MPI_COMM_WORLD);
+    //LOG_DEBUG("sd_node.Master", "Sent suggested delay between frames of ", delay, " to node ", PREPROCESSOR_A);
 
     Frame frameStruct;
     for (;;)

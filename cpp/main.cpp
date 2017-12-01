@@ -15,7 +15,6 @@
 #include "LogHelper.h"
 #include "SysInfo.h"
 #include <cstdlib>
-#include <ctime>
 #include <iostream>
 #include <thread>
 
@@ -23,28 +22,17 @@ using namespace cv;
 
 LogHelper sLog;
 
-void transferFrame(Frame *receivedFrame, int delay = -1);
-
 // Spawns a window and displays the frame
-void transferFrame(Frame *receivedFrame, int delay)
+void transferFrame(Frame *receivedFrame)
 {
     if (!receivedFrame) {
         LOG_ERROR("sd_renderer", "transferFrame(..) - Received null pointer for frame structure. Aborting");
         return;
     }
 
-    clock_t startTime = clock();
     // Simple display of each frame
     imshow("MPI Stream", receivedFrame->cvFrame);
-    if (delay < 0)
-        waitKey(50);
-    else
-    {
-        while (clock() - startTime < delay)
-        {
-            waitKey(1);
-        }
-    }
+    waitKey(40);
 }
 
 int main(int argc, char** argv)
@@ -92,15 +80,12 @@ int main(int argc, char** argv)
         master.setVideoFile(cv::String(videoFile));
         master.run();
     } else if (myId == PREPROCESSOR_A || myId == PREPROCESSOR_B) {
-        int delay = -1; 
-        if (myId == PREPROCESSOR_A)
-            MPI_Recv(&delay, 1, MPI_INT, MASTER_ID, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE); 
         Frame f;
         namedWindow("MPI Stream",1);
 	    for (;;)
 	    {
             f.receive(MASTER_ID);
-            transferFrame(&f, delay);
+            transferFrame(&f);
 	    }
     }
 
