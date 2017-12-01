@@ -15,6 +15,7 @@
 #include "LogHelper.h"
 #include "SysInfo.h"
 #include <cstdlib>
+#include <ctime>
 #include <iostream>
 #include <thread>
 
@@ -22,16 +23,28 @@ using namespace cv;
 
 LogHelper sLog;
 
+void transferFrame(Frame *receivedFrame, int delay = -1);
+
 // Spawns a window and displays the frame
-void transferFrame(Frame *receivedFrame)
+void transferFrame(Frame *receivedFrame, int delay)
 {
     if (!receivedFrame) {
         LOG_ERROR("sd_renderer", "transferFrame(..) - Received null pointer for frame structure. Aborting");
         return;
     }
-    // Simple display of the frame
+
+    clock_t startTime = clock();
+    // Simple display of each frame
     imshow("MPI Stream", receivedFrame->cvFrame);
-    waitKey(50);
+    if (delay < 0)
+        waitKey(50);
+    else
+    {
+        while (clock() - startTime < delay)
+        {
+            waitKey(1);
+        }
+    }
 }
 
 int main(int argc, char** argv)
@@ -44,7 +57,8 @@ int main(int argc, char** argv)
 
     // Attempt to load from the configuration file, using default settings on failure
     ConfigParser cfg;
-    if (cfg.load("Config.ini"))
+    bool cfgLoaded = cfg.load("Config.ini");
+    if (cfgLoaded)
     {
         sLog.setLogDir(cfg.getValue<std::string>("LogDir"));
         int logLevel = cfg.getValue<int>("LogLevel");
@@ -65,16 +79,28 @@ int main(int argc, char** argv)
 
     if (myId == MASTER_ID) {
         Master master;
-        master.setInputType(InputType::File);
-        master.setVideoFile(cv::String("test2.mp4"));
+
+        // Attempt to load settings from config file, defaulting to test2.mp4 if config not loaded
+        InputType mode = InputType::File;
+        std::string videoFile = "test2.mp4";
+        if (cfgLoaded)
+        {
+            mode = static_cast<InputType>(cfg.getValue<int>("InputType"));
+            videoFile = cfg.getValue<std::string>("InputFile");
+        }
+        master.setInputType(mode);
+        master.setVideoFile(cv::String(videoFile));
         master.run();
     } else if (myId == PREPROCESSOR_A || myId == PREPROCESSOR_B) {
+        int delay = -1; 
+        if (myId == PREPROCESSOR_A)
+            MPI_Recv(&delay, 1, MPI_INT, MASTER_ID, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE); 
         Frame f;
         namedWindow("MPI Stream",1);
 	    for (;;)
 	    {
             f.receive(MASTER_ID);
-            transferFrame(&f);
+            transferFrame(&f, delay);
 	    }
     }
 

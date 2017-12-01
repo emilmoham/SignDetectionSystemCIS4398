@@ -1,3 +1,4 @@
+#include <mpi.h> 
 #include "Master.h"
 #include "NodeID.h"
 #include "Frame.h"
@@ -40,6 +41,15 @@ void Master::extractFrames()
         LOG_ERROR("sd_node.Master", "Could not open video input");
         return;
     }
+
+    // Determine FPS of video source
+    int fps = (int) cap.get(CV_CAP_PROP_FPS);
+    int delay = 1000 / fps;
+
+    // Send delay information to rendering node
+    // TODO: only send delay info to the rendering node. need to pick a specific node or broadcast to all nodes
+    MPI_Send(&delay, 1, MPI_INT, PREPROCESSOR_A, 0, MPI_COMM_WORLD);
+    LOG_DEBUG("sd_node.Master", "Sent suggested delay between frames of ", delay, " to node ", PREPROCESSOR_A);
 
     Frame frameStruct;
     for (;;)
