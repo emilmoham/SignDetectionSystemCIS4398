@@ -8,6 +8,7 @@
 //
 
 #include "mpi.h"
+#include "ConfigParser.h"
 #include "Frame.h"
 #include "NodeID.h"
 #include "Master.h"
@@ -41,7 +42,22 @@ int main(int argc, char** argv)
     MPI_Comm_size(MPI_COMM_WORLD, &numNodes);
     MPI_Comm_rank(MPI_COMM_WORLD, &myId);
 
-    sLog.setLogDir("./");
+    // Attempt to load from the configuration file, using default settings on failure
+    ConfigParser cfg;
+    if (cfg.load("Config.ini"))
+    {
+        sLog.setLogDir(cfg.getValue<std::string>("LogDir"));
+        int logLevel = cfg.getValue<int>("LogLevel");
+        sLog.get("serializable")->SetLogLevel(logLevel);
+        sLog.get("sd_node.Master")->SetLogLevel(logLevel);
+        sLog.get("sd_renderer")->SetLogLevel(logLevel);
+        sLog.get("sd_textextraction")->SetLogLevel(logLevel);
+        sLog.get("SysInfo")->SetLogLevel(logLevel);
+    }
+    else
+    {
+        sLog.setLogDir("./");
+    }
     
     // Initialize info / debugging class and run in separate thread before main node objects are initialized
     SysInfo info(myId);
