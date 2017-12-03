@@ -12,6 +12,8 @@
 #include "Frame.h"
 #include "NodeID.h"
 #include "Master.h"
+#include "Preprocessor.h"
+#include "Analyzer.h"
 #include "LogHelper.h"
 #include "SysInfo.h"
 #include <cstdlib>
@@ -79,14 +81,31 @@ int main(int argc, char** argv)
         master.setInputType(mode);
         master.setVideoFile(cv::String(videoFile));
         master.run();
-    } else if (myId == PREPROCESSOR_A || myId == PREPROCESSOR_B) {
-        Frame f;
+    } else if (myId == PREPROCESSOR_ID) {
+        Preprocessor preproc;
+        preproc.run();
+/*
         namedWindow("MPI Stream",1);
 	    for (;;)
 	    {
             f.receive(MASTER_ID);
             transferFrame(&f);
 	    }
+*/
+    } else if (myId == ANALYZER_A || myId == ANALYZER_B) {
+        Analyzer analyzer;
+        analyzer.run();
+    } else if (myId == RENDERER_ID) {
+        FrameResult frameRes;
+        int counter = 0;
+        namedWindow("MPI Stream",1);
+        for (;;)
+        {
+            frameRes.receive((counter % 2 == 0) ? ANALYZER_A : ANALYZER_B);
+            transferFrame(&frameRes.frame);
+            //TODO: Rendering code not implemented. Must convert regions data in FrameResult into visible region in the 
+            //      original frame (frameRes.frame), or modify frameRes.frame to include bounding boxes, text, etc before calling transferFrame
+        }
     }
 
     t1.join();

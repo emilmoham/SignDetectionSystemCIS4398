@@ -21,6 +21,17 @@ Frame::Frame(cv::Mat frame, int frameIndex) :
 {
 }
 
+Frame::Frame(Frame &&other)
+{
+    cvFrame     = other.cvFrame;
+    index       = other.index;
+    m_buffer    = other.m_buffer;
+    m_bufferLen = other.m_bufferLen;
+
+    other.m_buffer = nullptr;
+    other.m_bufferLen = 0;
+}
+
 Frame::~Frame()
 {
     if (m_buffer != nullptr)

@@ -5,7 +5,9 @@
 #include "Passable.h"
 #include "Colors.h"
 #include "Shapes.h"
+#include "SignType.h"
 
+#include <string>
 #include <vector>
 
 /**
@@ -23,6 +25,12 @@ public:
 
     /// Bitfield of colors detected within the region
     Color::Value colors;
+
+    /// Type of sign (can be of type invalid or any other type in the SignType enum)
+    SignType signType;
+
+    /// Text extracted from the sign (can be an empty string)
+    std::string signText;
 
 public:
     /// Sends the region data to the given recipient
