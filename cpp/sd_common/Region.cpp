@@ -35,7 +35,7 @@ void Region::send(int recipient)
     int numPoints = 0;
     int ptData[2];
  
-    MPI_Send(&header, 4, MPI_INT, recipient, 0, MPI_COMM_WORLD);
+    MPI_Send(&header, 5, MPI_INT, recipient, 0, MPI_COMM_WORLD);
     
     if (textLen > 0)
         MPI_Send(const_cast<char*>(signText.c_str()), signText.size(), MPI_CHAR, recipient, 0, MPI_COMM_WORLD);
@@ -78,7 +78,7 @@ void Region::receive(int sender)
     int numContours = 0, numPoints = 0, textLen = 0;
     int ptData[2];
 
-    MPI_Recv(&header[0], 4, MPI_INT, sender, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+    MPI_Recv(&header[0], 5, MPI_INT, sender, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 
     shapeType = static_cast<Shape>(header[0]);
     colors = static_cast<Color::Value>(header[1]);
