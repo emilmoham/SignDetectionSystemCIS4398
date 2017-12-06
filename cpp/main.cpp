@@ -9,6 +9,7 @@
 #include "mpi.h"
 #include "ConfigParser.h"
 #include "Frame.h"
+#include "FrameResult.h"
 #include "NodeID.h"
 #include "Master.h"
 #include "Preprocessor.h"
@@ -163,14 +164,6 @@ int main(int argc, char** argv)
     } else if (myId == PREPROCESSOR_ID) {
         Preprocessor preproc;
         preproc.run();
-/*
-        namedWindow("MPI Stream",1);
-	    for (;;)
-	    {
-            f.receive(MASTER_ID);
-            transferFrame(&f);
-	    }
-*/
     } else if (myId == ANALYZER_A || myId == ANALYZER_B) {
         Analyzer analyzer;
         analyzer.run();
@@ -185,6 +178,10 @@ int main(int argc, char** argv)
             //TODO: Rendering code not implemented. Must convert regions data in FrameResult into visible region in the
             //      original frame (frameRes.frame), or modify frameRes.frame to include bounding boxes, text, etc before calling transferFrame
         }
+	  /*} else if (myId == RENDERER_ID) {
+      Renderer rend;
+      rend.setOutputMode(OutputMode::Debug);
+      rend.run();*/
     }
 
     t1.join();
