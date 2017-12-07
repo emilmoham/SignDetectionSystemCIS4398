@@ -175,14 +175,12 @@ int main(int argc, char** argv)
         {
             frameRes.receive((counter % 2 == 0) ? ANALYZER_A : ANALYZER_B);
             transferFrame(&frameRes.frame);
-            //TODO: Rendering code not implemented. Must convert regions data in FrameResult into visible region in the
-            //      original frame (frameRes.frame), or modify frameRes.frame to include bounding boxes, text, etc before calling transferFrame
         }
+    }
 	  /*} else if (myId == RENDERER_ID) {
       Renderer rend;
       rend.setOutputMode(OutputMode::Debug);
       rend.run();*/
-    }
 
     t1.join();
     MPI_Finalize();
