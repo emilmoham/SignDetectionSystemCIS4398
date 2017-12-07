@@ -20,6 +20,11 @@ public:
     /// Vector of contours. Point structure within contour only contains fields for x and y coordinates
     std::vector< std::vector<cv::Point> > cvContours;
 
+    /// Other sign data - used for opencv calls.
+    /// TODO: someone with a better understanding of the purpose of these could leave a more informative comment
+    std::vector<cv::Vec4i> vec4i;
+    std::vector< cv::Rect_<double> > rects;
+
     /// Type of shape 
     Shape shapeType;
 
