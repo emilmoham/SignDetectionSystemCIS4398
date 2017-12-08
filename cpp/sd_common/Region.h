@@ -38,6 +38,59 @@ public:
     std::string signText;
 
 public:
+    Region() = default;
+
+    /// Copy constructor
+    Region(const Region &other)
+    {
+	cvContours = other.cvContours;
+	vec4i = other.vec4i;
+	rects = other.rects;
+	shapeType = other.shapeType;
+	colors = other.colors;
+	signType = other.signType;
+	signText = other.signText;
+    }
+
+    /// Move constructor
+    Region(Region &&other)
+    {
+	cvContours = std::move(other.cvContours);
+	vec4i = std::move(other.vec4i);
+	rects = std::move(other.rects);
+	shapeType = other.shapeType;
+	colors = other.colors;
+	signType = other.signType;
+	signText = other.signText;
+    }
+
+    /// Copy assignment operator
+    Region &operator=(const Region &other)
+    {
+	cvContours = other.cvContours;
+	vec4i = other.vec4i;
+	rects = other.rects;
+	shapeType = other.shapeType;
+	colors = other.colors;
+	signType = other.signType;
+	signText = other.signText;
+	return *this;
+    }
+
+    /// Move assignment operator
+    Region &operator=(Region &&other)
+    {
+	cvContours = std::move(other.cvContours);
+	vec4i = std::move(other.vec4i);
+	rects = std::move(other.rects);
+	shapeType = other.shapeType;
+	colors = other.colors;
+	signType = other.signType;
+	signText = other.signText;
+	return *this;
+    }
+
+public:
     /// Sends the region data to the given recipient
     virtual void send(int recipient) override;
 

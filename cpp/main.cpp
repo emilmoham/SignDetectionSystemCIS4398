@@ -9,7 +9,6 @@
 #include "mpi.h"
 #include "ConfigParser.h"
 #include "Frame.h"
-#include "FrameResult.h"
 #include "NodeID.h"
 #include "Master.h"
 #include "Preprocessor.h"
@@ -23,11 +22,12 @@
 using namespace cv;
 
 LogHelper sLog;
+RNG rng(12345);
 
 // Spawns a window and displays the frame
-void transferFrame(Frame *receivedFrame)
+char transferFrame(Frame *receivedFrame)
 {
-    cv::Mat red1, red2, redFinal, yellowFinal;      //Color masks
+    cv::Mat converted, red1, red2, redFinal, yellowFinal;      //Color masks
     std::vector< std::vector<cv::Point> > contours; //Holds found contours
     std::vector<cv::Point> approx;                  //Used to find contours
     std::vector<cv::Vec4i> hierarchy;               //Used to draw contours
@@ -36,26 +36,40 @@ void transferFrame(Frame *receivedFrame)
 
     if (!receivedFrame) {
         LOG_ERROR("sd_renderer", "transferFrame(..) - Received null pointer for frame structure. Aborting");
-        return;
+        return 27;
     }
 
+    converted = receivedFrame->cvFrame.clone();
+
+    LOG_DEBUG("profiler", "Starting red filter");
     /*Red Filter*/
-    inRange(receivedFrame->cvFrame, Scalar(0, 80, 80), Scalar(10, 255, 255), red1);    //Low end of red mask
-    inRange(receivedFrame->cvFrame, Scalar(170, 80, 80), Scalar(180, 255, 255), red2); //High end of red mask
+    cvtColor(converted, converted, COLOR_BGR2HSV);
+    inRange(converted, Scalar(0, 80, 80), Scalar(10, 255, 255), red1);    //Low end of red mask
+    inRange(converted, Scalar(170, 80, 80), Scalar(180, 255, 255), red2); //High end of red mask
     redFinal = red1 | red2; //Final Mat for red mask
+    LOG_DEBUG("profiler", "Finished red filter");
 
+    LOG_DEBUG("profiler", "Starting yellow filter");
     /*Yellow Filter*/
-    inRange(receivedFrame->cvFrame, Scalar(25, 150, 150), Scalar(30, 255, 255), yellowFinal); //Yellow mask
+    inRange(converted, Scalar(25, 150, 150), Scalar(30, 255, 255), yellowFinal); //Yellow mask
+    LOG_DEBUG("profiler", "Finished yellow filter");
 
+    LOG_DEBUG("profiler", "Starting red blur");
     /*Edge pre-processing*/
     GaussianBlur(redFinal, redFinal, Size(9,9), 1.5, 1.5);                    //Blur red mask
     threshold (redFinal, redFinal, 0, 255, THRESH_BINARY|THRESH_OTSU);        //Threshold red mask
+    LOG_DEBUG("profiler", "Finished red blur");
+    LOG_DEBUG("profiler", "Starting yellow blur");
     GaussianBlur(yellowFinal, yellowFinal, Size(9,9), 1.5, 1.5);              //Blur yellow mask
     threshold (yellowFinal, yellowFinal, 0, 255, THRESH_BINARY|THRESH_OTSU);  //Threshold yellow mask
+    LOG_DEBUG("profiler", "Finished yellow blur");
 
+    LOG_DEBUG("profiler", "Finding red contours");
     /*Find and Draw contours in red mask*/
     findContours(redFinal, contours, hierarchy, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_TC89_KCOS);   //Find contours in red mask
+    LOG_DEBUG("profiler", "Found red contours");
 
+    LOG_DEBUG("profiler", "Start drawing red contours");
     /*Iterate through contours and draw edges around positively detected regions*/
     for( int i = 0; i < contours.size(); i++)
     {
@@ -81,11 +95,15 @@ void transferFrame(Frame *receivedFrame)
             }
         }
     } //End contour loop
+    LOG_DEBUG("profiler", "Done drawing red contours");
 
     /*Find and draw contours in yellow mask*/
+    LOG_DEBUG("profiler", "Finding yellow contours");
     findContours(yellowFinal, contours, hierarchy, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_TC89_KCOS);
+    LOG_DEBUG("profiler", "Found yellow contours");
     largestArea = 0;
 
+    LOG_DEBUG("profiler", "Drawing yellow contours");
     /*Iterate through contours and draw edges around positively detected regions*/
     for( int i = 0; i < contours.size(); i++)
     {
@@ -111,10 +129,11 @@ void transferFrame(Frame *receivedFrame)
             }
         }
     } //End contour loop
+    LOG_DEBUG("profiler", "Done drawing yellow contours");
 
     // Simple display of each frame
     imshow("MPI Stream", receivedFrame->cvFrame);
-    waitKey(40);
+    return (char)waitKey(40);
 }
 
 int main(int argc, char** argv)
@@ -164,23 +183,42 @@ int main(int argc, char** argv)
     } else if (myId == PREPROCESSOR_ID) {
         Preprocessor preproc;
         preproc.run();
+/*
+        namedWindow("MPI Stream",1);
+	    for (;;)
+	    {
+            f.receive(MASTER_ID);
+            transferFrame(&f);
+	    }
+*/
     } else if (myId == ANALYZER_A || myId == ANALYZER_B) {
         Analyzer analyzer;
         analyzer.run();
     } else if (myId == RENDERER_ID) {
+	// get fps, width, height of video
+	int buffer[3];
+	MPI_Recv(&buffer[0], 3, MPI_INT, MASTER_ID, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE); 
+
         FrameResult frameRes;
         int counter = 0;
         namedWindow("MPI Stream",1);
-        for (;;)
+	VideoWriter writer;
+	writer.open("output.avi", CV_FOURCC('M', 'J', 'P', 'G'), buffer[0], Size(buffer[1], buffer[2]), true); 
+	if (!writer.isOpened())
+		LOG_ERROR("output", "Could not open output file");
+	char c = '\0';
+	int i = 0;
+        while (i++ != 100)
         {
             frameRes.receive((counter % 2 == 0) ? ANALYZER_A : ANALYZER_B);
-            transferFrame(&frameRes.frame);
+	    counter++;
+            c = transferFrame(&frameRes.frame);
+	    writer.write(frameRes.frame.cvFrame);
+            //TODO: Rendering code not implemented. Must convert regions data in FrameResult into visible region in the
+            //      original frame (frameRes.frame), or modify frameRes.frame to include bounding boxes, text, etc before calling transferFrame
         }
+	writer.release();
     }
-	  /*} else if (myId == RENDERER_ID) {
-      Renderer rend;
-      rend.setOutputMode(OutputMode::Debug);
-      rend.run();*/
 
     t1.join();
     MPI_Finalize();
