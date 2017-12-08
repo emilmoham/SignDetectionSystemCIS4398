@@ -24,6 +24,7 @@ void transferFrame(Frame *receivedFrame)
         return;
     }
     // Simple display of the frame
+    //std::cout << "Attempting to display frame" << std::endl;
     imshow("MPI Stream", receivedFrame->cvFrame);
     waitKey(50);
 }
