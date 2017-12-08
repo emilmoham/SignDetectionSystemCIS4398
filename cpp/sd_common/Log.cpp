@@ -58,14 +58,15 @@ void Log::CloseFile()
 string Log::GetTimestamp()
 {
     ostringstream timeStr;
-    char timeBuffer[10];
+    char timeBuffer[13];
     
     time(&m_rawTime);
     struct tm timeInfo;
+    timespec ts;
+    clock_gettime(CLOCK_REALTIME, &ts);
     localtime_r(&m_rawTime, &timeInfo);
-    
-    strftime(timeBuffer, 10, "%R", &timeInfo);  // %R = 24 hour time
-    timeStr << "[" << timeInfo.tm_mon + 1 << "/" << timeInfo.tm_mday << "/" << timeInfo.tm_year % 100 << ", " << timeBuffer << "] "; // [{Month}/{Day}/{Year} HH:MM]
+    strftime(timeBuffer, 10, "%R:%S", &timeInfo);  // %R = 24 hour time
+    timeStr << "[" << timeInfo.tm_mon + 1 << "/" << timeInfo.tm_mday << "/" << timeInfo.tm_year % 100 << ", " << timeBuffer << " " << ts.tv_nsec / (1000 * 1000)  << " msec] "; // [{Month}/{Day}/{Year} HH:MM]
     
     return timeStr.str();
 }

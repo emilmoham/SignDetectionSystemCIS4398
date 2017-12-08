@@ -187,6 +187,7 @@ int main(int argc, char** argv)
         sLog.get("sd_renderer")->SetLogLevel(logLevel);
         sLog.get("sd_textextraction")->SetLogLevel(logLevel);
         sLog.get("SysInfo")->SetLogLevel(logLevel);
+	sLog.get("profiler")->SetLogLevel(logLevel);
     }
     else
     {
