@@ -3,6 +3,18 @@
 #include "FrameResult.h"
 #include <utility>
 
+FrameResult::FrameResult(const FrameResult &other)
+{
+    frame = other.frame;
+    regions = other.regions;
+}
+
+FrameResult::FrameResult(FrameResult &&other)
+{
+    frame = std::move(other.frame);
+    regions = std::move(other.regions);
+}
+
 FrameResult::FrameResult(Frame &&f) :
     frame(std::move(f)),
     regions()

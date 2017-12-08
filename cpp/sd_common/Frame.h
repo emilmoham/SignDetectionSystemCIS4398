@@ -24,8 +24,20 @@ public:
     // Constructs a frame, given the OpenCV frame object and an index
     Frame(cv::Mat frame, int frameIndex);
 
+    // Copy constructor
+    Frame(const Frame &other);
+
     // Move constructor
     Frame(Frame &&other);
+
+    // Copy assignment operator
+    Frame &operator=(const Frame &other)
+    {
+        cvFrame = other.cvFrame;
+	index = other.index;
+	m_buffer = other.m_buffer;
+	m_bufferLen = other.m_bufferLen;
+    }
 
     // Move assignment operator
     Frame &operator=(Frame &&other)

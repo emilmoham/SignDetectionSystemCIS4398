@@ -21,6 +21,14 @@ Frame::Frame(cv::Mat frame, int frameIndex) :
 {
 }
 
+Frame::Frame(const Frame &other)
+{
+    cvFrame  = other.cvFrame;
+    index    = other.index;
+    m_buffer = other.m_buffer;
+    m_bufferLen = other.m_bufferLen;
+}
+
 Frame::Frame(Frame &&other)
 {
     cvFrame     = other.cvFrame;

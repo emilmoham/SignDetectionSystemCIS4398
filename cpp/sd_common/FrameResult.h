@@ -16,6 +16,12 @@ public:
     /// Default constructor
     FrameResult() = default;
 
+    /// FrameResult copy constructor
+    FrameResult(const FrameResult &other);
+
+    /// FrameResult move constructor
+    FrameResult(FrameResult &&other);
+
     /// FrameResult constructor
     FrameResult(Frame &&f);
 
