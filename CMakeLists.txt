@@ -2,7 +2,14 @@ cmake_minimum_required(VERSION 2.8.12)
 
 find_package(OpenCV REQUIRED)
 find_package(MPI REQUIRED)
-include_directories(${OpenCV_INCLUDE_DIRS})
+set(Tesseract_INCLUDE_DIRS /usr/include/tesseract /usr/include/leptonica)
+find_library(Leptonica_LIBRARY lept HINTS /usr/lib)
+find_library(Tesseract_LIBRARY tesseract HINTS /usr/lib)
+
+include_directories(${OpenCV_INCLUDE_DIRS} ${Tesseract_INCLUDE_DIRS})
+
+set(THREADS_PREFER_PTHREAD_FLAG ON)
+find_package(Threads REQUIRED)
 
 set(CURRENT_COMPILER "STD")
 

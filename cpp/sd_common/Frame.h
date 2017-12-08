@@ -1,8 +1,9 @@
 #ifndef __FRAME_H_
-#define __FRAME_H__
+#define __FRAME_H_
 
 #include "opencv2/opencv.hpp"
 #include "Passable.h"
+#include <utility>
 
 /**
  * @class Frame
@@ -22,6 +23,23 @@ public:
 
     // Constructs a frame, given the OpenCV frame object and an index
     Frame(cv::Mat frame, int frameIndex);
+
+    // Move constructor
+    Frame(Frame &&other);
+
+    // Move assignment operator
+    Frame &operator=(Frame &&other)
+    {
+        cvFrame = other.cvFrame;
+        index = other.index;
+        m_buffer = other.m_buffer;
+        m_bufferLen = other.m_bufferLen;
+
+        other.m_buffer = nullptr;
+        other.m_bufferLen = 0;
+
+        return *this;
+    }
     
     // Frame destructor - frees memory allocated to m_buffer if it was used during the lifetime of the frame
     ~Frame();
