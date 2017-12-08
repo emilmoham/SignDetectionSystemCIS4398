@@ -59,7 +59,7 @@ void transferFrame(Frame *receivedFrame)
     /*Iterate through contours and draw edges around positively detected regions*/
     for( int i = 0; i < contours.size(); i++)
     {
-        Scalar color = Scalar( rng.uniform(0, 255), rng.uniform(0,255), rng.uniform(0,255) );
+        Scalar color = Scalar( 124, 252, 0 );
         approxPolyDP(Mat(contours[i]), approx, arcLength(Mat(contours[i]), true) * 0.02, true);
 
         if(fabs(contourArea(contours[i])) < 300 || !isContourConvex(approx)){   //Skip small stuff
@@ -89,7 +89,7 @@ void transferFrame(Frame *receivedFrame)
     /*Iterate through contours and draw edges around positively detected regions*/
     for( int i = 0; i < contours.size(); i++)
     {
-        Scalar color = Scalar( rng.uniform(0, 255), rng.uniform(0,255), rng.uniform(0,255) );
+        Scalar color = Scalar( 124, 252, 0 );
         approxPolyDP(Mat(contours[i]), approx, arcLength(Mat(contours[i]), true) * 0.02, true);
 
         if(fabs(contourArea(contours[i])) < 300 || !isContourConvex(approx)){   //Skip small stuff
