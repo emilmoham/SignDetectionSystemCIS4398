@@ -29,10 +29,9 @@ char transferFrame(Frame *receivedFrame)
 {
     cv::Mat converted, red1, red2, redFinal, yellowFinal;      //Color masks
     std::vector< std::vector<cv::Point> > contours; //Holds found contours
+    std::vector< std::vector<cv::Point> > contours2; //Holds found contours
     std::vector<cv::Point> approx;                  //Used to find contours
     std::vector<cv::Vec4i> hierarchy;               //Used to draw contours
-    std::vector<vector<cv::Point> > contours_poly(contours.size());
-    std::vector<cv::Rect> boundRect(contours.size());
     int largestArea=0;
     int largestContourIndex=0;
 
@@ -71,6 +70,9 @@ char transferFrame(Frame *receivedFrame)
     findContours(redFinal, contours, hierarchy, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_TC89_KCOS);   //Find contours in red mask
     LOG_DEBUG("profiler", "Found red contours");
 
+    std::vector<vector<cv::Point> > contours_poly(contours.size());
+    std::vector<cv::Rect> boundRect(contours.size());
+
     LOG_DEBUG("profiler", "Start drawing red contours");
     /*Iterate through contours and draw edges around positively detected regions*/
     for( int i = 0; i < contours.size(); i++)
@@ -93,7 +95,7 @@ char transferFrame(Frame *receivedFrame)
                 largestArea = a;
                 if (largestArea > 60){
                     largestContourIndex = i;
-                    drawContours(receivedFrame->cvFrame, contours, largestContourIndex, color, 2, 8, hierarchy, 0, Point() );
+                    //drawContours(receivedFrame->cvFrame, contours, largestContourIndex, color, 2, 8, hierarchy, 0, Point() );
 		    rectangle( receivedFrame->cvFrame, boundRect[i].tl(), boundRect[i].br(), color, 2, 8, 0 );
 		    putText(receivedFrame->cvFrame, "YIELD", cvPoint(30,30),
                                 FONT_HERSHEY_COMPLEX_SMALL, 1.2, cvScalar(0,0,0), 1, CV_AA);
@@ -103,15 +105,15 @@ char transferFrame(Frame *receivedFrame)
         }
 	else if (approx.size() > 7 && approx.size() < 10){    //This line checks number of sides detected
                 double a=contourArea( contours[i],false);  //  Find the area of cont
-                if(a>largest_area){
-                    largest_area=a;
-                    if (largest_area > 60){
-                        largest_contour_index=i;
-                        drawContours( receivedFrame->cvFrame, contours, largest_contour_index, color, 2, 8, hierarchy, 0, Point() );
+                if(a>largestArea){
+                    largestArea=a;
+                    if (largestArea > 60){
+                        largestContourIndex=i;
+                        //drawContours( receivedFrame->cvFrame, contours, largestContourIndex, color, 2, 8, hierarchy, 0, Point() );
                         rectangle( receivedFrame->cvFrame, boundRect[i].tl(), boundRect[i].br(), color, 2, 8, 0 );                        
                         putText(receivedFrame->cvFrame, "STOP", cvPoint(30,30),
                                 FONT_HERSHEY_COMPLEX_SMALL, 1.2, cvScalar(0,0,0), 1, CV_AA);
-                        largest_area = 0;
+                        largestArea = 0;
                     }
                 }
             }
@@ -120,7 +122,7 @@ char transferFrame(Frame *receivedFrame)
 
     /*Find and draw contours in yellow mask*/
     LOG_DEBUG("profiler", "Finding yellow contours");
-    findContours(yellowFinal, contours, hierarchy, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_TC89_KCOS);
+    findContours(yellowFinal, contours2, hierarchy, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_TC89_KCOS);
     LOG_DEBUG("profiler", "Found yellow contours");
     largestArea = 0;
 
@@ -130,7 +132,7 @@ char transferFrame(Frame *receivedFrame)
     vector<Rect> boundRect2( contours2.size() );
 
     /*Iterate through contours and draw edges around positively detected regions*/
-    for( int i = 0; i < contours.size(); i++)
+    for( int i = 0; i < contours2.size(); i++)
     {
 	    Scalar color = Scalar( 124, 252, 0 );
             approxPolyDP(Mat(contours2[i]), approx2, arcLength(Mat(contours2[i]), true) * 0.02, true);
@@ -144,16 +146,16 @@ char transferFrame(Frame *receivedFrame)
             
             else if (approx2.size() > 2 && approx2.size() < 6){    //This line checks number of sides detected
                 double a=contourArea(contours2[i],false);  //  Find the area of cont
-                if(a>largest_area){
-                    largest_area=a;
-                    if (largest_area > 50){
-                        largest_contour_index=i;
+                if(a>largestArea){
+                    largestArea=a;
+                    if (largestArea > 50){
+                        largestContourIndex=i;
                         //cout << largest_area;
-                        drawContours( receivedFrame->cvFrame, contours2, largest_contour_index, color, 2, 8, hierarchy, 0, Point() );
+                        //drawContours( receivedFrame->cvFrame, contours2, largestContourIndex, color, 2, 8, hierarchy, 0, Point() );
                         rectangle( receivedFrame->cvFrame, boundRect2[i].tl(), boundRect2[i].br(), color, 2, 8, 0 );
                         putText(receivedFrame->cvFrame, "WARNING", cvPoint(30,30),
                                 FONT_HERSHEY_COMPLEX_SMALL, 1.2, cvScalar(0,0,0), 1, CV_AA);
-                        largest_area = 0;
+                        largestArea = 0;
                     }
                 }   
             }
@@ -237,7 +239,7 @@ int main(int argc, char** argv)
 		LOG_ERROR("output", "Could not open output file");
 	char c = '\0';
 	int i = 0;
-        while (i++ != 100)
+        while (c != 27)
         {
             frameRes.receive((counter % 2 == 0) ? ANALYZER_A : ANALYZER_B);
 	    counter++;
