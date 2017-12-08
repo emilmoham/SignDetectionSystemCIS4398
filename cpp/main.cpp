@@ -31,6 +31,8 @@ char transferFrame(Frame *receivedFrame)
     std::vector< std::vector<cv::Point> > contours; //Holds found contours
     std::vector<cv::Point> approx;                  //Used to find contours
     std::vector<cv::Vec4i> hierarchy;               //Used to draw contours
+    std::vector<vector<cv::Point> > contours_poly(contours.size());
+    std::vector<cv::Rect> boundRect(contours.size());
     int largestArea=0;
     int largestContourIndex=0;
 
@@ -75,13 +77,15 @@ char transferFrame(Frame *receivedFrame)
     {
         Scalar color = Scalar( 124, 252, 0 );
         approxPolyDP(Mat(contours[i]), approx, arcLength(Mat(contours[i]), true) * 0.02, true);
+	approxPolyDP( Mat(contours[i]), contours_poly[i], 3, true );
+	boundRect[i] = boundingRect( Mat(contours_poly[i]) );
 
         if(fabs(contourArea(contours[i])) < 300 || !isContourConvex(approx)){   //Skip small stuff
             continue;
         }
 
         /*If a red sign with between 3 and 10 contours found (stop sign or yield). Contours are not always exact, thus the padding*/
-        if (approx.size() > 3 && approx.size() < 10){
+        else if (approx.size() >= 3 && approx.size() < 7){
             double a = contourArea( contours[i], false);  //Find the area of contour
 
             /*Check if contour is the largest found within the color masked frame. If so, it's probably a sign.*/
@@ -90,10 +94,27 @@ char transferFrame(Frame *receivedFrame)
                 if (largestArea > 60){
                     largestContourIndex = i;
                     drawContours(receivedFrame->cvFrame, contours, largestContourIndex, color, 2, 8, hierarchy, 0, Point() );
+		    rectangle( receivedFrame->cvFrame, boundRect[i].tl(), boundRect[i].br(), color, 2, 8, 0 );
+		    putText(receivedFrame->cvFrame, "YIELD", cvPoint(30,30),
+                                FONT_HERSHEY_COMPLEX_SMALL, 1.2, cvScalar(0,0,0), 1, CV_AA);
                     largestArea = 0;
                 }
             }
         }
+	else if (approx.size() > 7 && approx.size() < 10){    //This line checks number of sides detected
+                double a=contourArea( contours[i],false);  //  Find the area of cont
+                if(a>largest_area){
+                    largest_area=a;
+                    if (largest_area > 60){
+                        largest_contour_index=i;
+                        drawContours( receivedFrame->cvFrame, contours, largest_contour_index, color, 2, 8, hierarchy, 0, Point() );
+                        rectangle( receivedFrame->cvFrame, boundRect[i].tl(), boundRect[i].br(), color, 2, 8, 0 );                        
+                        putText(receivedFrame->cvFrame, "STOP", cvPoint(30,30),
+                                FONT_HERSHEY_COMPLEX_SMALL, 1.2, cvScalar(0,0,0), 1, CV_AA);
+                        largest_area = 0;
+                    }
+                }
+            }
     } //End contour loop
     LOG_DEBUG("profiler", "Done drawing red contours");
 
@@ -104,30 +125,38 @@ char transferFrame(Frame *receivedFrame)
     largestArea = 0;
 
     LOG_DEBUG("profiler", "Drawing yellow contours");
+    vector<Point> approx2;   //Vector of points for finding contours
+    vector<vector<Point> > contours_poly2( contours2.size() );
+    vector<Rect> boundRect2( contours2.size() );
+
     /*Iterate through contours and draw edges around positively detected regions*/
     for( int i = 0; i < contours.size(); i++)
     {
-        Scalar color = Scalar( 124, 252, 0 );
-        approxPolyDP(Mat(contours[i]), approx, arcLength(Mat(contours[i]), true) * 0.02, true);
-
-        if(fabs(contourArea(contours[i])) < 300 || !isContourConvex(approx)){   //Skip small stuff
-            continue;
-        }
-
-        /*If yellow sign between 2 and 5 contours found (warning sign). Contours are not always exact, thus the padding.*/
-        if (approx.size() > 2 && approx.size() < 5){
-            double a = contourArea(contours[i],false);  //Find the area of contour
-
-            /*Check if contour is the largest found within the color masked frame. If so, it's probably a sign.*/
-            if(a > largestArea){
-                largestArea = a;
-                if (largestArea > 60){
-                    largestContourIndex = i;
-                    drawContours(receivedFrame->cvFrame, contours, largestContourIndex, color, 2, 8, hierarchy, 0, Point() );
-                    largestArea = 0;
-                }
+	    Scalar color = Scalar( 124, 252, 0 );
+            approxPolyDP(Mat(contours2[i]), approx2, arcLength(Mat(contours2[i]), true) * 0.02, true);
+            approxPolyDP( Mat(contours2[i]), contours_poly2[i], 3, true );
+            boundRect2[i] = boundingRect( Mat(contours_poly2[i]) );
+            
+            
+            if(fabs(contourArea(contours2[i])) < 300 || !isContourConvex(approx2)){   //Skip small stuff
+                continue;
             }
-        }
+            
+            else if (approx2.size() > 2 && approx2.size() < 6){    //This line checks number of sides detected
+                double a=contourArea(contours2[i],false);  //  Find the area of cont
+                if(a>largest_area){
+                    largest_area=a;
+                    if (largest_area > 50){
+                        largest_contour_index=i;
+                        //cout << largest_area;
+                        drawContours( receivedFrame->cvFrame, contours2, largest_contour_index, color, 2, 8, hierarchy, 0, Point() );
+                        rectangle( receivedFrame->cvFrame, boundRect2[i].tl(), boundRect2[i].br(), color, 2, 8, 0 );
+                        putText(receivedFrame->cvFrame, "WARNING", cvPoint(30,30),
+                                FONT_HERSHEY_COMPLEX_SMALL, 1.2, cvScalar(0,0,0), 1, CV_AA);
+                        largest_area = 0;
+                    }
+                }   
+            }
     } //End contour loop
     LOG_DEBUG("profiler", "Done drawing yellow contours");
 
