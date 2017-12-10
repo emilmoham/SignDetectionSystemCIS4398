@@ -20,7 +20,6 @@
 #include <thread>
 
 LogHelper sLog;
-RNG rng(12345);
 
 int main(int argc, char** argv)
 {
