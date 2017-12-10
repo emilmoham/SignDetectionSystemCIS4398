@@ -2,6 +2,7 @@
 #include "Master.h"
 #include "NodeID.h"
 #include "Frame.h"
+#include "FrameResult.h"
 #include "LogHelper.h"
 
 void Master::setInputType(InputType type)
@@ -49,24 +50,20 @@ void Master::extractFrames()
     buffer[2] = (int) cap.get(CV_CAP_PROP_FRAME_HEIGHT);
     MPI_Send(&buffer[0], 3, MPI_INT, RENDERER_ID, 0, MPI_COMM_WORLD);
  
-    //int delay = 1000 / fps;
-
-    // Send delay information to rendering node
-    // TODO: only send delay info to the rendering node. need to pick a specific node or broadcast to all nodes
-     //MPI_Send(&delay, 1, MPI_INT, PREPROCESSOR_A, 0, MPI_COMM_WORLD);
-    //LOG_DEBUG("sd_node.Master", "Sent suggested delay between frames of ", delay, " to node ", PREPROCESSOR_A);
-
-    Frame frameStruct;
+    //Frame frameStruct;
+    FrameResult fr;
     for (;;)
     {
         // Extract the next frame from the video source
-        cap >> frameStruct.cvFrame;
+        cap >> fr.frame.cvFrame;
 
         // Assign an index to the frame
-        frameStruct.index = m_counter;
+        fr.frame.index = m_counter;
 
-        //frameStruct.send((m_counter % 2 == 0) ? PREPROCESSOR_A : PREPROCESSOR_B);
-        frameStruct.send(PREPROCESSOR_ID);
+        //frameStruct.send(PREPROCESSOR_ID);
+        fr.send(ANALYZER_A);
+        fr.send(ANALYZER_B);
+        fr.send(ANALYZER_C);
 
         // Increment counter
         ++m_counter;

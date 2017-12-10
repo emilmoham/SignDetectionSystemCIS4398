@@ -5,9 +5,10 @@
 enum NodeID
 {
     MASTER_ID       = 0,
-    PREPROCESSOR_ID = 1,
-    ANALYZER_A      = 2, 
-    ANALYZER_B      = 3,
+//    PREPROCESSOR_ID = 1,
+    ANALYZER_A      = 1, 
+    ANALYZER_B      = 2,
+    ANALYZER_C      = 3,
     RENDERER_ID     = 4
 };
 

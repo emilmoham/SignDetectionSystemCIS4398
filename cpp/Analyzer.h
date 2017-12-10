@@ -1,10 +1,21 @@
 #ifndef __ANALYZER_H_
 #define __ANALYZER_H_
                                                                                                                                                                                                
-#include "opencv2/opencv.hpp"
+#include <opencv2/opencv.hpp>
 #include "FrameResult.h"
 #include "Node.h"
+#include "Region.h"
 #include "TextExtractor.h"
+#include <vector>
+
+/// Color masks the analyzer can use
+enum class ColorMask
+{
+    None = 0,
+    Red,
+    Yellow,
+    White
+};
 
 /**
  * @class Analyzer
@@ -17,6 +28,9 @@ class Analyzer : public Node
 public:
     /// Default constructor
     Analyzer() = default;
+
+    /// Specifies which color mask the analyzer should use on frames
+    void setColorMask(ColorMask mask);
 
     /// Runs the analyzer's main execution loop - retrieving preprocessed frame data and 
     /// running a classification process in order to extract sign information before sending
@@ -31,6 +45,15 @@ private:
 private:
     /// Text extractor module
     TextExtractor m_textExtractor;
+
+    /// Used to find contours during analysis
+    std::vector<cv::Point> m_approx;
+
+    /// Regions, used in each call to getSignInformation()
+    Region m_region, m_regionPoly;
+
+    /// Color mask used by the node
+    ColorMask m_colorMask;
 };
 
 #endif //__ANALYZER_H_

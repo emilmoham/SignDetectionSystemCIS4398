@@ -3,7 +3,7 @@
 
 #include "opencv2/opencv.hpp"
 #include "Node.h"
-#include "headers/FrameStructs.h"
+#include "FrameResult.h"
 
 /// Modes of output 
 enum class OutputMode
@@ -28,10 +28,8 @@ public:
     /// Sets the output mode
     void setOutputMode(OutputMode mode);
 
-    /// Sets the video file to be used for frame parsing
-    //void setVideoFile(cv::String file);
-
-    void renderFrameResult(FrameResult fr);
+    /// Overlays sign information on top of the given frame before rendering it to the screen
+    void renderFrameResult(FrameResult &fr);
 
     /// Runs the renderer node path of execution
     void run() override;
@@ -43,14 +41,6 @@ private:
 private:
     /// Input type
     OutputMode m_outputMode;
-
-    /// File name for video capture
-    //cv::String m_videoFile;
-
-    /// Frame counter
-    //int m_counter;
-
-    /// 
 };
 
 #endif //__RENDERER_H_

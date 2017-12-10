@@ -1,7 +1,8 @@
 #ifndef __REGION_H_
 #define __REGION_H_
 
-#include "opencv2/opencv.hpp"
+#include <opencv2/opencv.hpp>
+
 #include "Passable.h"
 #include "Colors.h"
 #include "Shapes.h"
@@ -20,10 +21,11 @@ public:
     /// Vector of contours. Point structure within contour only contains fields for x and y coordinates
     std::vector< std::vector<cv::Point> > cvContours;
 
-    /// Other sign data - used for opencv calls.
-    /// TODO: someone with a better understanding of the purpose of these could leave a more informative comment
-    std::vector<cv::Vec4i> vec4i;
-    std::vector< cv::Rect_<double> > rects;
+    /// Hierarchy used for finding contours
+    std::vector<cv::Vec4i> hierarchy;
+
+    /// Bounding rects
+    std::vector<cv::Rect> rects;
 
     /// Type of shape 
     Shape shapeType;
@@ -43,51 +45,51 @@ public:
     /// Copy constructor
     Region(const Region &other)
     {
-	cvContours = other.cvContours;
-	vec4i = other.vec4i;
-	rects = other.rects;
-	shapeType = other.shapeType;
-	colors = other.colors;
-	signType = other.signType;
-	signText = other.signText;
+        cvContours = other.cvContours;
+        hierarchy = other.hierarchy;
+        rects = other.rects;
+        shapeType = other.shapeType;
+        colors = other.colors;
+        signType = other.signType;
+        signText = other.signText;
     }
 
     /// Move constructor
     Region(Region &&other)
     {
-	cvContours = std::move(other.cvContours);
-	vec4i = std::move(other.vec4i);
-	rects = std::move(other.rects);
-	shapeType = other.shapeType;
-	colors = other.colors;
-	signType = other.signType;
-	signText = other.signText;
+        cvContours = std::move(other.cvContours);
+        hierarchy = std::move(other.hierarchy);
+        rects = std::move(other.rects);
+        shapeType = other.shapeType;
+        colors = other.colors;
+        signType = other.signType;
+        signText = other.signText;
     }
 
     /// Copy assignment operator
     Region &operator=(const Region &other)
     {
-	cvContours = other.cvContours;
-	vec4i = other.vec4i;
-	rects = other.rects;
-	shapeType = other.shapeType;
-	colors = other.colors;
-	signType = other.signType;
-	signText = other.signText;
-	return *this;
+        cvContours = other.cvContours;
+   	    hierarchy = other.hierarchy;
+        rects = other.rects;
+        shapeType = other.shapeType;
+        colors = other.colors;
+        signType = other.signType;
+        signText = other.signText;
+	    return *this;
     }
 
     /// Move assignment operator
     Region &operator=(Region &&other)
     {
-	cvContours = std::move(other.cvContours);
-	vec4i = std::move(other.vec4i);
-	rects = std::move(other.rects);
-	shapeType = other.shapeType;
-	colors = other.colors;
-	signType = other.signType;
-	signText = other.signText;
-	return *this;
+        cvContours = std::move(other.cvContours);
+        hierarchy = std::move(other.hierarchy);
+        rects = std::move(other.rects);
+        shapeType = other.shapeType;
+        colors = other.colors;
+        signType = other.signType;
+        signText = other.signText;
+	    return *this;
     }
 
 public:

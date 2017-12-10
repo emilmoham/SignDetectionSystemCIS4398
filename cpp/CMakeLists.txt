@@ -3,7 +3,7 @@ project(SignDetection)
 add_subdirectory(sd_common)
 add_subdirectory(sd_textextraction)
 
-set(SignDetection_SRC Master.cpp Preprocessor.cpp Analyzer.cpp SysInfo.cpp main.cpp)
+set(SignDetection_SRC Master.cpp Preprocessor.cpp Analyzer.cpp Renderer.cpp SysInfo.cpp main.cpp)
 
 use_mpi_compiler()
 include_directories(sd_common sd_textextraction ${OpenCV_INCLUDE_DIRS} ${Tesseract_INCLUDE_DIRS})

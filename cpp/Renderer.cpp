@@ -1,9 +1,10 @@
 #include "Renderer.h"
 #include "NodeID.h"
-#include "Frame.h"
+#include "FrameResult.h"
 #include "LogHelper.h"
 
-#include "sd_render/Render.h"
+#include <opencv2/opencv.hpp>
+#include <mpi.h>
 
 void Renderer::setOutputMode(OutputMode mode)
 {
@@ -12,52 +13,103 @@ void Renderer::setOutputMode(OutputMode mode)
 
 void Renderer::run()
 {
-  FrameResult fr;
-  // loop forever and wait for FrameResults to come in...
-  namedWindow("Detected Signs", 1); // TODO only needed if visual
-  for(;;){
-    fr.receive(ANALYZER_A); // is this right?
-    renderFrameResult(fr);
-    
-    //if(waitKey(30) >= 0)   // needed?
-    //  break;
-  }
-}
+    // Get fps, width, height of video
+    int buffer[3];
+    MPI_Recv(&buffer[0], 3, MPI_INT, MASTER_ID, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE); 
 
-void Renderer::renderFrameResult(FrameResult fr){
-    // render frame based on output mode
-  switch(m_outputMode){
-  default: debugVisual(fr);
-    // TODO other modes
-  }
-}
+    FrameResult fr;
 
-void debugVisual(FrameResult fr){
-  std::vector<std::vector<cv::Point> > contours;
-    contours = fr.region.contours; // TODO list of regions
-        std::vector<cv::Point> approx;
-        cv::Mat dst = fr.frameStruct.cFrame.clone();
+    char c = '\0';
+    cv::namedWindow("Detected Signs", 1);
+
+    // Open output file
+    cv::VideoWriter writer;
+    writer.open("output.avi", CV_FOURCC('M', 'J', 'P', 'G'), buffer[0], cv::Size(buffer[1], buffer[2]), true); 
+    if (!writer.isOpened())
+        LOG_ERROR("output", "Could not open output file");
+
+    int analysisBuffer[2];
+    while (c != 27) 
+    {
+        fr.receive(MASTER_ID);
         
-        for (int i = 0; i < contours.size(); i++)
+        // Get analyzer results
+        MPI_Recv(&analysisBuffer, 2, MPI_INT, ANALYZER_A, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+        if (analysisBuffer[0] == fr.frame.index && analysisBuffer[1] > 0)
         {
-            // Approximate contour with accuracy proportional
-            // to the contour perimeter
-            //cv::approxPolyDP(cv::Mat(contours[i]), approx, cv::arcLength(cv::Mat(contours[i]), true)*0.02, true);
-            
-            // Skip small or non-convex objects
-            //if (std::fabs(cv::contourArea(contours[i])) < 100 || !cv::isContourConvex(approx))
-	  //continue;
-
-	    int shape = fr.region.shape;
-
-	    sd_labelShape(dst, shape, contours[i]); // place label
+            Region r;
+            r.receive(ANALYZER_A);
+            fr.regions.push_back(std::move(r));
+        }
+        MPI_Recv(&analysisBuffer, 2, MPI_INT, ANALYZER_B, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+        if (analysisBuffer[0] == fr.frame.index && analysisBuffer[1] > 0)
+        {
+            Region r;
+            r.receive(ANALYZER_B);
+            fr.regions.push_back(std::move(r));
+        }
+        MPI_Recv(&analysisBuffer, 2, MPI_INT, ANALYZER_C, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+        if (analysisBuffer[0] == fr.frame.index && analysisBuffer[1] > 0)
+        {
+            Region r;
+            r.receive(ANALYZER_C);
+            fr.regions.push_back(std::move(r));
         }
 
-	// drawing contours
-	for( int i = 0; i< contours.size(); i++ ) {
-	  sd_drawContours(dst, contours);
-	}
+        renderFrameResult(fr);
 
-	// render visual output
-        cv::imshow("Detected Signs", dst);
+        c = cv::waitKey(40);
+        writer.write(fr.frame.cvFrame);
+    }
+
+    writer.release();
+}
+
+void Renderer::renderFrameResult(FrameResult &fr)
+{
+    /* Fixed output mode: on screen while saving to file
+    switch(m_outputMode){
+        default: debugVisual(fr); break;
+    }
+    */
+
+    cv::Scalar color = cv::Scalar(124, 252, 0);
+    std::string signText;
+    int i = 1;
+    for (const auto &r : fr.regions)
+    {
+        for (const auto &rect : r.rects)
+            cv::rectangle(fr.frame.cvFrame, rect.tl(), rect.br(), color, 2, 8, 0);
+        
+        if (r.signText.empty())
+        {
+            switch (r.signType)
+            {
+                case STOP_SIGN:
+                    signText = "Stop";
+                    break;
+                case YIELD_SIGN:
+                    signText = "Yield";
+                    break;
+                case WARNING_SIGN:
+                    signText = "Warning";
+                    break;
+                case SPEED_LIMIT:
+                    signText = "Speed Limit";
+                    break;
+                default: break;
+            }
+        }
+        else
+            signText = r.signText;
+
+        if (!signText.empty())
+        {
+            cv::putText(fr.frame.cvFrame, signText, cvPoint(30 * i, 30 * i), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.2,
+                cvScalar(0, 0, 0), 1, CV_AA);
+        }
+
+        cv::imshow("Detected Signs", fr.frame.cvFrame);
+    }
+
 }

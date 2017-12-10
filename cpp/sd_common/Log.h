@@ -70,6 +70,9 @@ public:
     {
         m_logLevel = logLevel;
     }
+
+    /// Returns the log level.
+    int GetLogLevel() const { return m_logLevel; }
     
     /// Prints a formatted string to the console and log file
     template <typename Text, typename... Extra>

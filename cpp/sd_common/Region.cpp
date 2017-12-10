@@ -27,7 +27,7 @@ void Region::send(int recipient)
     header[1] = static_cast<int>(colors);
     header[2] = static_cast<int>(signType);
     header[3] = static_cast<int>(cvContours.size());
-    header[4] = static_cast<int>(vec4i.size());
+    header[4] = static_cast<int>(hierarchy.size());
     header[5] = static_cast<int>(rects.size());
 
     int textLen = static_cast<int>(signText.size());
@@ -54,22 +54,21 @@ void Region::send(int recipient)
         }
     }
 
-    int vecBuffer[4];
-    for (auto &vec : vec4i)
+    int dataBuffer[4];
+    for (auto &vec : hierarchy)
     {
         for (int i = 0; i < 4; ++i)
-            vecBuffer[i] = vec[i];
-	MPI_Send(&vecBuffer, 4, MPI_INT, recipient, 0, MPI_COMM_WORLD);
+            dataBuffer[i] = vec[i];
+        MPI_Send(&dataBuffer, 4, MPI_INT, recipient, 0, MPI_COMM_WORLD);
     }
 
-    double rectBuffer[4];
     for (auto &rect : rects)
     {
-        rectBuffer[0] = rect.x;
-	rectBuffer[1] = rect.y;
-	rectBuffer[2] = rect.width;
-	rectBuffer[3] = rect.height;
-	MPI_Send(&rectBuffer, 4, MPI_DOUBLE, recipient, 0, MPI_COMM_WORLD);
+        dataBuffer[0] = rect.x;
+        dataBuffer[1] = rect.y;
+        dataBuffer[2] = rect.width;
+        dataBuffer[3] = rect.height;
+        MPI_Send(&dataBuffer, 4, MPI_INT, recipient, 0, MPI_COMM_WORLD);
     }
 }
 
@@ -130,26 +129,25 @@ void Region::receive(int sender)
         cvContours.push_back(std::move(points));
     }
 
-    int vecBuffer[4];
+    int dataBuffer[4];
     cv::Vec4i vec;
     for (int i = 0; i < numVec4i; ++i)
     {
-        MPI_Recv(&vecBuffer, 4, MPI_INT, sender, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-	for (int j = 0; j < 4; ++j)
-            vec[j] = vecBuffer[j];
-	vec4i.push_back(vec);
+        MPI_Recv(&dataBuffer, 4, MPI_INT, sender, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+        for (int j = 0; j < 4; ++j)
+            vec[j] = dataBuffer[j];
+        hierarchy.push_back(vec);
     }
 
-    double rectBuffer[4];
-    cv::Rect_<double> rect;
+    cv::Rect rect;
     for (int i = 0; i < numRects; ++i)
     {
-        MPI_Recv(&rectBuffer, 4, MPI_DOUBLE, sender, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-	rect.x = rectBuffer[0];
-	rect.y = rectBuffer[1];
-	rect.width = rectBuffer[2];
-	rect.height = rectBuffer[3];
-	rects.push_back(rect);
+        MPI_Recv(&dataBuffer, 4, MPI_INT, sender, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+        rect.x = dataBuffer[0];
+        rect.y = dataBuffer[1];
+        rect.width = dataBuffer[2];
+        rect.height = dataBuffer[3];
+        rects.push_back(rect);
     }
 }
 

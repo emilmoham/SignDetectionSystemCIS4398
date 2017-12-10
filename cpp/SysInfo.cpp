@@ -21,6 +21,9 @@ SysInfo::SysInfo(int nodeId) :
 
 void SysInfo::run()
 {
+    if (sLog.get("SysInfo")->GetLogLevel() < LOG_DEBUG)
+        return;
+
     while (true)
     {
         printCPUStats();
