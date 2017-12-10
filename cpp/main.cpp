@@ -69,6 +69,14 @@ int main(int argc, char** argv)
         master.run();
     } else if (myId == ANALYZER_A || myId == ANALYZER_B || myId == ANALYZER_C) {
         Analyzer analyzer;
+        ColorMask mask = ColorMask::None;
+        if (myId == ANALYZER_A)
+            mask = ColorMask::Red;
+        else if (myId == ANALYZER_B)
+            mask = ColorMask::Yellow;
+        else
+            mask = ColorMask::White;
+        analyzer.setColorMask(mask);
         analyzer.run();
     } else if (myId == RENDERER_ID) {
         Renderer renderer;
