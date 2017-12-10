@@ -64,6 +64,7 @@ void Master::extractFrames()
         fr.send(ANALYZER_A);
         fr.send(ANALYZER_B);
         fr.send(ANALYZER_C);
+        fr.send(RENDERER_ID);
 
         // Increment counter
         ++m_counter;
