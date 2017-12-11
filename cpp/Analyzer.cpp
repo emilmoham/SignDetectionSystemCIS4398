@@ -47,7 +47,7 @@ void Analyzer::getSignInformation(FrameResult &frameResult)
     cvtColor(converted, converted, cv::COLOR_BGR2HSV);
 
     cv::Mat finalMat;
-    double largestArea = 0.0, largestAreaThresh = 0.0;
+    double largestArea = 0.0, largestAreaThresh = 0.0, smallestAreaThresh = 0.0; ratio = 0.0;
     int largestContourIndex = 0;
     int minContours = 0, maxContours = 0;
 
@@ -58,6 +58,7 @@ void Analyzer::getSignInformation(FrameResult &frameResult)
             resultRegion.colors = Color::Red;
             minContours = 2;
             maxContours = 7;
+	    smallestAreaThresh = 10000.0;
             largestAreaThresh = 60.0;
             cv::Mat red1, red2;
             inRange(converted, cv::Scalar(0, 80, 80), cv::Scalar(10, 255, 255), red1);    //Low end of red mask
@@ -70,13 +71,19 @@ void Analyzer::getSignInformation(FrameResult &frameResult)
             resultRegion.colors = Color::Yellow;
             minContours = 2;
             maxContours = 6;
-            largestAreaThresh = 50.0;
+	    smallestAreaThresh = 10000.0;
+            largestAreaThresh = 20.0;
             inRange(converted, cv::Scalar(25, 150, 150), cv::Scalar(30, 255, 255), finalMat);
             break;
         }
         case ColorMask::White:
         {
             resultRegion.colors = Color::White;
+            minContours = 3;
+            maxContours = 5;
+	    smallestAreaThresh = 800.0
+            largestAreaThresh = 300.0;
+            inRange(converted, cv::Scalar(0, 0, 210), cv::Scalar(255, 50, 255), finalMat);
             break;
         }
         default:
@@ -110,9 +117,26 @@ void Analyzer::getSignInformation(FrameResult &frameResult)
         else
         {
             auto approxSize = m_approx.size();
+            bool ratioOk = (m_colorMask == ColorMask::Red);
+            if (m_colorMask == ColorMask::Yellow) // || m_colorMask == ColorMask::White)
+            {
+		ratio = m_regionPoly.rects[i].height / m_regionPoly.rects[i].width;
+		if (ratio > 0.8 && ratio < 1.2)
+		{
+			ratioOk = true;
+		} 
+            }
+	    if (m_colorMask == ColorMask::White)
+	    {
+		ratio = m_regionPoly.rects[i].height / m_regionPoly.rects[i].width;
+		if (ratio >= 0.99 && ratio <= 1.01)
+		{
+			ratioOk = true;
+		}
+	    }
             const bool hasContoursForSign = ((approxSize > minContours) && (approxSize < maxContours));
             const bool hasContoursForStopSign = (m_colorMask == ColorMask::Red && approxSize > maxContours && approxSize < 10);
-            if (hasContoursForSign || hasContoursForStopSign) 
+            if (ratioOk && (hasContoursForSign || hasContoursForStopSign)) 
             {
                 // Find area of contour
                 double a = cv::contourArea(m_region.cvContours[i], false);
@@ -121,7 +145,7 @@ void Analyzer::getSignInformation(FrameResult &frameResult)
                 if (a > largestArea)
                 {
                     largestArea = a;
-                    if (largestArea > largestAreaThresh)
+                    if (largestArea > largestAreaThresh && largestArea < smallestAreaThresh)
                     {
                         largestContourIndex = i;
 
