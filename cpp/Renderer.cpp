@@ -74,10 +74,10 @@ void Renderer::renderFrameResult(FrameResult &fr)
     */
 
     cv::Scalar color = cv::Scalar(124, 252, 0);
-    std::string signText;
     int i = 1;
     for (const auto &r : fr.regions)
     {
+        std::string signText;
         for (const auto &rect : r.rects)
             cv::rectangle(fr.frame.cvFrame, rect.tl(), rect.br(), color, 2, 8, 0);
         
@@ -107,6 +107,7 @@ void Renderer::renderFrameResult(FrameResult &fr)
         {
             cv::putText(fr.frame.cvFrame, signText, cvPoint(30 * i, 30 * i), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.2,
                 cvScalar(0, 0, 0), 1, CV_AA);
+	    ++i;
         }
 
         cv::imshow("Detected Signs", fr.frame.cvFrame);

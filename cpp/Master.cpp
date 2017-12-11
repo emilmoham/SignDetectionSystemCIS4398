@@ -48,6 +48,9 @@ void Master::extractFrames()
     buffer[0] = (int) cap.get(CV_CAP_PROP_FPS); // fps
     buffer[1] = (int) cap.get(CV_CAP_PROP_FRAME_WIDTH);
     buffer[2] = (int) cap.get(CV_CAP_PROP_FRAME_HEIGHT);
+    MPI_Send(&buffer[0], 3, MPI_INT, ANALYZER_A, 0, MPI_COMM_WORLD);
+    MPI_Send(&buffer[0], 3, MPI_INT, ANALYZER_B, 0, MPI_COMM_WORLD);
+    MPI_Send(&buffer[0], 3, MPI_INT, ANALYZER_C, 0, MPI_COMM_WORLD);
     MPI_Send(&buffer[0], 3, MPI_INT, RENDERER_ID, 0, MPI_COMM_WORLD);
  
     //Frame frameStruct;
@@ -63,7 +66,7 @@ void Master::extractFrames()
         //frameStruct.send(PREPROCESSOR_ID);
         fr.send(ANALYZER_A);
         fr.send(ANALYZER_B);
-        fr.send(ANALYZER_C);
+	fr.send(ANALYZER_C);
         fr.send(RENDERER_ID);
 
         // Increment counter

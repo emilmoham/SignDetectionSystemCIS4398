@@ -43,6 +43,12 @@ private:
     void getSignInformation(FrameResult &frameResult);
 
 private:
+    /// Width of frames
+    int m_width;
+
+    /// Height of frames
+    int m_height;
+
     /// Text extractor module
     TextExtractor m_textExtractor;
 
