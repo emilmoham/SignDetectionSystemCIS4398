@@ -67,12 +67,6 @@ void Renderer::run()
 
 void Renderer::renderFrameResult(FrameResult &fr)
 {
-    /* Fixed output mode: on screen while saving to file
-    switch(m_outputMode){
-        default: debugVisual(fr); break;
-    }
-    */
-
     cv::Scalar color = cv::Scalar(124, 252, 0);
     int i = 1;
     for (const auto &r : fr.regions)
@@ -97,7 +91,7 @@ void Renderer::renderFrameResult(FrameResult &fr)
                 case SPEED_LIMIT:
                     signText = "Speed Limit";
                     break;
-                default: break;
+                default: signText = std::string(); break;
             }
         }
         else
@@ -107,10 +101,10 @@ void Renderer::renderFrameResult(FrameResult &fr)
         {
             cv::putText(fr.frame.cvFrame, signText, cvPoint(30 * i, 30 * i), cv::FONT_HERSHEY_COMPLEX_SMALL, 1.2,
                 cvScalar(0, 0, 0), 1, CV_AA);
-	    ++i;
+    	    ++i;
         }
 
-        cv::imshow("Detected Signs", fr.frame.cvFrame);
     }
+    cv::imshow("Detected Signs", fr.frame.cvFrame);
 
 }
