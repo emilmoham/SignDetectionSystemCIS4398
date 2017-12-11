@@ -70,10 +70,10 @@ void Analyzer::getSignInformation(FrameResult &frameResult)
         {
             resultRegion.colors = Color::Yellow;
             minContours = 2;
-            maxContours = 6;
+            maxContours = 10;
 	    smallestAreaThresh = 10000.0;
             largestAreaThresh = 20.0;
-            inRange(converted, cv::Scalar(25, 150, 150), cv::Scalar(30, 255, 255), finalMat);
+            inRange(converted, cv::Scalar(25, 100, 150), cv::Scalar(30, 255, 255), finalMat);
             break;
         }
         case ColorMask::White:
