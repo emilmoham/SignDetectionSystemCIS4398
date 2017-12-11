@@ -8,6 +8,11 @@
 void Analyzer::run()
 {
     FrameResult frameRes;
+    int metaData[3];
+    MPI_Recv(&metaData[0], 3, MPI_INT, MASTER_ID, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+    m_width = metaData[1];
+    m_height = metaData[2];
+
     int buffer[2];
     for (;;)
     {
@@ -76,6 +81,9 @@ void Analyzer::getSignInformation(FrameResult &frameResult)
         }
         case ColorMask::White:
         {
+	    /*
+	     * Seems to crash without min and max contours > 0
+	     */
             resultRegion.colors = Color::White;
             break;
         }
@@ -145,7 +153,9 @@ void Analyzer::getSignInformation(FrameResult &frameResult)
                         // Extract text from sign region
                         if (sign != INVALID_SIGN)
                         {
-                            resultRegion.signText = m_textExtractor.getText(frameResult.frame.cvFrame(m_regionPoly.rects[i]));
+			    auto &rect = m_regionPoly.rects[i];
+			    if (rect.width >= m_width / 10) 
+                            	resultRegion.signText = m_textExtractor.getText(frameResult.frame.cvFrame(m_regionPoly.rects[i]));
                         }
 
                         resultRegion.signType = sign;
