@@ -49,14 +49,14 @@ void receiveAndVerifyFrame() {
     // Compare digest values
     for (int i = 0; i < SHA256_ARRAY_LEN; ++i) {
         if (digestGiven[i] != digestCalc[i]) {
-	    std::cout << "[Test] [Preprocessor A]: Error: Frame digests unequal" << std::endl;
-            std::cout << "[Test] [Preprocessor A]: Test Failed" << std::endl;
+	    std::cout << "[Test] [Node 1]: Error: Frame digests unequal" << std::endl;
+            std::cout << "[Test] [Node 1]: Test Failed" << std::endl;
 	    free(digestCalc);
 	    return;
 	}
     }
-    std::cout << "[Test] [Preprocessor A]: Received frame, integrity of frame structure is verified." << std::endl;
-    std::cout << "[Test] [Preprocessor A]: Test Passed" << std::endl;
+    std::cout << "[Test] [Node 1]: Received frame, integrity of frame structure is verified." << std::endl;
+    std::cout << "[Test] [Node 1]: Test Passed" << std::endl;
     free(digestCalc);
 }
 
@@ -68,10 +68,10 @@ int main(int argc, char **argv)
     MPI_Comm_size(MPI_COMM_WORLD, &numNodes);
     MPI_Comm_rank(MPI_COMM_WORLD, &myId);
     if (myId == MASTER_ID) {
-	std::cout  << "[Test] [Master Node]: Sending first frame of \"test2.mp4\" to preprocessor a" << std::endl;
+	std::cout  << "[Test] [Node 0]: Sending first frame of \"test2.mp4\" to preprocessor a" << std::endl;
         sendFrameWithDigest(cv::String("./test2.mp4"));
     } else if (myId == PREPROCESSOR_A) {
-	std::cout  << "[Test] [Preprocessor A]: Starting verification test of frame sent by master node." << std::endl;
+	std::cout  << "[Test] [Node 1]: Starting verification test of frame sent by master node." << std::endl;
         receiveAndVerifyFrame();
     }
     MPI_Finalize();
